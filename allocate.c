@@ -12,23 +12,16 @@ struct process {
     // store CPU id too - -1 for no cpu
 };
 
-struct process* head = NULL;  // name of the pointer is head and not pointing to anything...
+struct process* head = NULL;  // name of the pointer is head and not pointing to anything...  
 
 
-struct process* insert_process(struct process* head, char* process_data) {
+void insert_process(char* process_data) {
 
    struct process* new_node = (struct process*)malloc(sizeof(struct process));
    struct process* temp;
-
-   if (head == NULL) {
-       head = new_node;
-       temp = new_node;
-   }
-
-
+   
    // Extract the first token
    char * token = strtok(process_data, " ");
-
    int count = 0;
    // loop through the string to extract all other tokens
    while( token != NULL ) {
@@ -46,23 +39,34 @@ struct process* insert_process(struct process* head, char* process_data) {
       }
       else if (count==3){
           new_node->parallelisability = token;
-      }
-      else if (count==4) {
-          new_node->next = NULL;
-      }
+      } 
+      
     /****************************/
-
       token = strtok(NULL, " ");
       count++;
    }
-   printf("%d\n", new_node->arr_time);
-   printf("%d\n", new_node->pid);
-   printf("%d\n", new_node->exec_time);
-   printf("%s\n", new_node->parallelisability);
-   printf("%p\n", new_node->next);                // Confusion on this output
-   printf("\n");
 
-   return new_node;
+   new_node->next = NULL;
+
+//    printf("%d\n", new_node->arr_time);
+//    printf("%d\n", new_node->pid);
+//    printf("%d\n", new_node->exec_time);
+//    printf("%s\n", new_node->parallelisability);
+//    printf("%p\n", new_node->next);                // Confusion on this output
+//    printf("\n");
+
+   if (head == NULL){
+       head = new_node;
+    //    printf("%d\n", (head)->arr_time);
+       return; 
+   }
+
+   temp = head;
+   while (temp->next != NULL) {
+       temp = temp->next;
+   }
+   temp->next = new_node;
+   return;
 
 }
 
@@ -86,7 +90,7 @@ struct process* insert_process(struct process* head, char* process_data) {
 
 int main(int argc, char* argv[]) {
 
-    
+      
 
     char line[1000]; // use malloc later
 
@@ -101,9 +105,17 @@ int main(int argc, char* argv[]) {
 
     // reads text until newline is encountered
     while (EOF != fscanf(fptr, "%[^\n]\n", line)) {
-        insert_process(head, line);
+        insert_process(line);
         proc_rem++;
     }
+
+    // printf("%p", head);
+    struct process* temp = head;
+    while (temp != NULL){
+        printf("%d\n", temp->arr_time);
+        temp = temp->next;
+    }
+    
     
     fclose(fptr);
 
