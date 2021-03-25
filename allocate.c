@@ -12,10 +12,10 @@ struct process {
     // store CPU id too - -1 for no cpu
 };
 
-struct process* head = NULL;  // name of the pointer is head and not pointing to anything...  
 
 
-void insert_process(char* process_data) {
+
+void insert_process(struct process** head_ptr, char* process_data) {
 
    struct process* new_node = (struct process*)malloc(sizeof(struct process));
    struct process* temp;
@@ -55,13 +55,13 @@ void insert_process(char* process_data) {
 //    printf("%p\n", new_node->next);                // Confusion on this output
 //    printf("\n");
 
-   if (head == NULL){
-       head = new_node;
-    //    printf("%d\n", (head)->arr_time);
+   if (*head_ptr == NULL){
+       *head_ptr = new_node;
+    //    printf("%d\n", (*head_ptr)->arr_time);
        return; 
    }
 
-   temp = head;
+   temp = *head_ptr;
    while (temp->next != NULL) {
        temp = temp->next;
    }
@@ -90,7 +90,7 @@ void insert_process(char* process_data) {
 
 int main(int argc, char* argv[]) {
 
-      
+    struct process* head = NULL;  // name of the pointer is head and not pointing to anything...  
 
     char line[1000]; // use malloc later
 
@@ -105,11 +105,11 @@ int main(int argc, char* argv[]) {
 
     // reads text until newline is encountered
     while (EOF != fscanf(fptr, "%[^\n]\n", line)) {
-        insert_process(line);
+        insert_process(&head, line);
         proc_rem++;
     }
 
-    // printf("%p", head);
+    // printf("HEAD POINTER = %p\n", head);
     struct process* temp = head;
     while (temp != NULL){
         printf("%d\n", temp->arr_time);
