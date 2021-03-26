@@ -11,6 +11,7 @@ struct process {
 
     int rem_exec_time;
     int cpu_id;
+    char* state;
 
     struct process *next; // Pointer pointing to the next process stored in the Linked List
 
@@ -86,23 +87,9 @@ struct process* shortest_rem_exec_time(struct process* head)  // NEED TO SORT OU
     // is 32767 or greater.
     int min = INT_MAX;
 
-    //Below code checks if all processes have zero remaining execution time or not
-    while (temp != NULL){
-        if (temp->rem_exec_time == 0){
-            temp = temp->next;
-        }
-        else{
-            break; // breaks out of loop if a non-zero rem_exec_time is seen
-        }
-
-        if (temp == NULL){
-            return NULL;
-        }
-    }
-  
-    temp = head; // Resetting temp to head
+    
     // Check loop while head not equal to NULL
-    while (temp != NULL && (temp->rem_exec_time != 0)) { // temp->rem_exec_time != 0 is to leave out those processes that have already finished
+    while (temp != NULL) { // temp->rem_exec_time != 0 is to leave out those processes that have already finished
   
         // If min is greater then head->data then
         // assign value of head->data to min

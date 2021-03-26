@@ -36,6 +36,7 @@ void insert_process(struct process** head_ptr, char* process_data) {
 
    new_node->rem_exec_time = new_node->exec_time;
    new_node->cpu_id = 0;
+   new_node->state = "IDLE";
    new_node->next = NULL;
 
 //    printf("%d\n", new_node->arr_time);
@@ -94,8 +95,8 @@ int main(int argc, char* argv[]) {
             if (head->arr_time == current_time){  // FOR FIRST PROCESS
 
                 run = head; //Pointing to the running process
-
-                printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_id);
+                strcpy(run->state, "RUNNING");
+                printf("%d,%s,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->state, run->pid, run->rem_exec_time, run->cpu_id);
 
                 // (head->rem_exec_time)--;
 
@@ -108,7 +109,8 @@ int main(int argc, char* argv[]) {
 
                 if (get_pointer_to_process_equal_to_curr_time(head, current_time)->rem_exec_time < run->rem_exec_time){
                     run = get_pointer_to_process_equal_to_curr_time(head, current_time);
-                    printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_id);
+                    strcpy(run->state, "RUNNING");
+                    printf("%d,%s,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->state, run->pid, run->rem_exec_time, run->cpu_id);
                 }
                 // Else do nothing, i.e. keep run pointer to previous process
             }
@@ -118,15 +120,19 @@ int main(int argc, char* argv[]) {
 
         (run->rem_exec_time)--; //To decrement the running process's execution time
         current_time++;
+
         if (run->rem_exec_time == 0){
             proc_rem--;
-            printf("%d,FINISHED,pid=%d,proc_remaining=%d\n", current_time, run->pid, proc_rem);
+            strcpy(run->state, "FINISHED");
+            printf("%d,%s,pid=%d,proc_remaining=%d\n", current_time, run->state, run->pid, proc_rem);
 
             // CHECK AGAIN HERE TO SET THE PROCESS WITH THE SHORTEST EXECUTION TIME
             //Traverse trough LL from head to find node with lowest rem_exec_time and set it to the run pointer
-            // run = shortest_rem_exec_time(head);
+
+            run = shortest_rem_exec_time(head);
             // printf("%d\n", shortest_rem_exec_time(head)->rem_exec_time);
-            printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_id);
+            strcpy(run->state, "RUNNING");
+            printf("%d,%s,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->state, run->pid, run->rem_exec_time, run->cpu_id);
 
             (run->rem_exec_time)--; //This increment needs to be added again for the unique case after a process finishes
             current_time++;         //This decrement needs to be added again for the unique case after a process finishes
