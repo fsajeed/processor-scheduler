@@ -125,10 +125,11 @@ int main(int argc, char* argv[]) {
             // CHECK AGAIN HERE TO SET THE PROCESS WITH THE SHORTEST EXECUTION TIME
             //Traverse trough LL from head to find node with lowest rem_exec_time and set it to the run pointer
             // run = shortest_rem_exec_time(head);
-            // printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_id);
+            // printf("%d\n", shortest_rem_exec_time(head)->rem_exec_time);
+            printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_id);
 
-            // (run->rem_exec_time)--; //This increment needs to be added again for the unique case after a process finishes
-            // current_time++;         //This decrement needs to be added again for the unique case after a process finishes
+            (run->rem_exec_time)--; //This increment needs to be added again for the unique case after a process finishes
+            current_time++;         //This decrement needs to be added again for the unique case after a process finishes
 
             
         }

@@ -79,6 +79,7 @@ struct process* shortest_rem_exec_time(struct process* head)  // NEED TO SORT OU
 
     struct process* temp = head;
     struct process* min_ptr;
+    
     // Declare a min variable and initialize
     // it with UINT_MAX value.
     // UINT_MAX is integer type and its value
