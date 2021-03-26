@@ -1,19 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h> // For exit() function
 #include <string.h>
-
-struct process {
-    int arr_time;                // make unsigned long int
-    int pid;      // make unsigned long int
-    int exec_time;
-    char *parallelisability;     // Not sure if needed for now // need to conver to just character later
-    struct process *next; // Pointer pointing to the next process stored in the Linked List
-
-    // store CPU id too - -1 for no cpu
-};
-
-
-
+#include "allocate.h"
 
 void insert_process(struct process** head_ptr, char* process_data) {
 
@@ -39,13 +27,15 @@ void insert_process(struct process** head_ptr, char* process_data) {
       }
       else if (count==3){
           new_node->parallelisability = token;
-      } 
+      }  
       
     /****************************/
       token = strtok(NULL, " ");
       count++;
    }
 
+   new_node->rem_exec_time = new_node->exec_time;
+   new_node->cpu_id = 0;
    new_node->next = NULL;
 
 //    printf("%d\n", new_node->arr_time);
@@ -57,7 +47,6 @@ void insert_process(struct process** head_ptr, char* process_data) {
 
    if (*head_ptr == NULL){
        *head_ptr = new_node;
-    //    printf("%d\n", (*head_ptr)->arr_time);
        return; 
    }
 
@@ -70,27 +59,11 @@ void insert_process(struct process** head_ptr, char* process_data) {
 
 }
 
-//void insert_process(char* process_data) {
-
-    // create_node(process_data);
-
- /*    // first process or not
-    if (head == NULL) {
-        head = (struct process *)malloc(sizeof(struct process));
-        head->next = 
-    } */
-
-    // If First process -> Create Node -> Move "head pointer" from "Null" to that "Node address"
-    
-
-    // If Latter processes -> Create Node -> Traverse to end of Linked List -> Insert process there
-
-    // If Last process read -> Create Node -> Traverse to end of Linked List -> Insert process there -> Point the "next" poniter to "Null"
-//}
-
 int main(int argc, char* argv[]) {
 
     struct process* head = NULL;  // name of the pointer is head and not pointing to anything...  
+
+    int current_time=0;
 
     char line[1000]; // use malloc later
 
@@ -109,15 +82,70 @@ int main(int argc, char* argv[]) {
         proc_rem++;
     }
 
-    // printf("HEAD POINTER = %p\n", head);
-    struct process* temp = head;
-    while (temp != NULL){
-        printf("%d\n", temp->arr_time);
-        temp = temp->next;
+
+    struct process* run; // To point to the running process
+
+    while (current_time != 130){
+
+        //run = head; // Because first process always run first
+
+        if (search(head, current_time))/* Checks if any process's arrival time in LL is equal to the current time */{
+
+            if (head->arr_time == current_time){  // FOR FIRST PROCESS
+
+                run = head; //Pointing to the running process
+
+                printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_id);
+
+                // (head->rem_exec_time)--;
+
+            }
+            
+            
+            //Below code is for any other process except for the first one
+            // Check rem_exec_time of that process with the running process's rem_exec_time
+            else {
+
+                if (get_pointer_to_process_equal_to_curr_time(head, current_time)->rem_exec_time < run->rem_exec_time){
+                    run = get_pointer_to_process_equal_to_curr_time(head, current_time);
+                    printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_id);
+                }
+                // Else do nothing, i.e. keep run pointer to previous process
+            }
+
+
+        }
+
+        (run->rem_exec_time)--; //To decrement the running process's execution time
+        current_time++;
+        if (run->rem_exec_time == 0){
+            proc_rem--;
+            printf("%d,FINISHED,pid=%d,proc_remaining=%d\n", current_time, run->pid, proc_rem);
+
+            // CHECK AGAIN HERE TO SET THE PROCESS WITH THE SHORTEST EXECUTION TIME
+            //Traverse trough LL from head to find node with lowest rem_exec_time and set it to the run pointer
+            // run = shortest_rem_exec_time(head);
+            // printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_id);
+
+            // (run->rem_exec_time)--; //This increment needs to be added again for the unique case after a process finishes
+            // current_time++;         //This decrement needs to be added again for the unique case after a process finishes
+
+            
+        }
+        
+        // printf("%d\n", current_time);
     }
-    
+
     
     fclose(fptr);
 
     return 0;
 }
+
+
+        //TRAVERSE AND PRINT LL
+        // struct process* temp = head;
+        // while (temp != NULL){
+        //     printf("%d\n", temp->arr_time);
+        //     temp = temp->next;
+        // }
