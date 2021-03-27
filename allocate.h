@@ -11,7 +11,6 @@ struct process {
 
     int rem_exec_time;
     int cpu_id;
-    char* state;
 
     struct process *next; // Pointer pointing to the next process stored in the Linked List
 
@@ -75,33 +74,105 @@ struct process* get_pointer_to_process_equal_to_curr_time(struct process* head, 
     return current;
 }
 
-struct process* shortest_rem_exec_time(struct process* head)  // NEED TO SORT OUT TIES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-{
+bool is_all_process_completed(struct process* head){
 
-    struct process* temp = head;
-    struct process* min_ptr;
-    
-    // Declare a min variable and initialize
-    // it with UINT_MAX value.
-    // UINT_MAX is integer type and its value
-    // is 32767 or greater.
-    int min = INT_MAX;
+    struct process* curr = head;
 
-    
-    // Check loop while head not equal to NULL
-    while (temp != NULL) { // temp->rem_exec_time != 0 is to leave out those processes that have already finished
-  
-        // If min is greater then head->data then
-        // assign value of head->data to min
-        // otherwise node point to next node.
-        if (min > (temp->rem_exec_time)) {
-            min = temp->rem_exec_time;
-            min_ptr = temp;
+    while (curr->rem_exec_time == 0){  // While loop checking if all rem_exec_time values are 0
+        curr = curr->next;
+
+        if (curr==NULL){
+        return true;
         }
+    }
+    return false;
+
+    
+
+}
+
+// Function to print the second
+// smallest element
+struct process* get_shortest_rem_exec_time_process(struct process* head)
+
+{
+    int first = 0, second = INT_MAX; // Here first is equal to 0 is because, we know the first lowest rem_exec_time is 0 as one process already finished
+  
+    struct process* temp = head;
+    struct process* ptr;
+    while (temp != NULL) {
+  
+        if (temp->rem_exec_time < first) {
+            second = first;
+            first = temp->rem_exec_time;
+        }
+  
+        // If current node's data is in between
+        // first and second then update second
+        else if (temp->rem_exec_time < second && temp->rem_exec_time != first){
+            second = temp->rem_exec_time;
+            ptr = temp;
+
+        }
+  
         temp = temp->next;
     }
-    return min_ptr;
+  
+    if (second == INT_MAX){
+        // cout << "There is no second smallest element\n";
+        return NULL;
+    }
+    else {
+        return ptr;
+    }
 }
+
+// struct process* shortest_rem_exec_time(struct process* head)  // NEED TO SORT OUT TIES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// {
+
+//     struct process* temp = head;
+//     struct process* min_ptr;
+    
+//     // Declare a min variable and initialize
+//     // it with UINT_MAX value.
+//     // UINT_MAX is integer type and its value
+//     // is 32767 or greater.
+//     int min = INT_MAX;
+
+//     //Below code checks if all processes have zero remaining execution time or not
+//     while (temp != NULL){
+//         if (temp->rem_exec_time == 0){
+//             temp = temp->next;
+//         }
+//         else{
+//             break; // breaks out of loop if a non-zero rem_exec_time is seen
+//         }
+//         return NULL;
+//         // if (temp == NULL){
+//         //     return NULL;
+//         // }
+//     }
+  
+//     temp = head; // Resetting temp to head
+//     // Check loop while head not equal to NULL
+//     while (temp != NULL) { // temp->rem_exec_time != 0 is to leave out those processes that have already finished
+
+//         if  (temp->rem_exec_time == 0){
+
+//             temp = temp->next;
+  
+//             // If min is greater then head->data then
+//             // assign value of head->data to min
+//             // otherwise node point to next node.
+//             if (min > (temp->rem_exec_time)) {
+//                 min = temp->rem_exec_time;
+//                 min_ptr = temp;
+//             }
+//             temp = temp->next;
+//         }
+//     }
+//     return min_ptr;
+// }
 
 
     // struct process* find_lowest_arr_time(struct process* head_ptr) {
