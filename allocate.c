@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h> // For exit() function
 #include <string.h>
+#include <stdbool.h>
 #include "allocate.h"
 
 void insert_process(struct process** head_ptr, char* process_data) {
@@ -85,7 +86,7 @@ int main(int argc, char* argv[]) {
 
     struct process* run; // To point to the running process
 
-    while (current_time != 130){
+    while (proc_rem != 0){
 
         //run = head; // Because first process always run first
 
@@ -132,6 +133,10 @@ int main(int argc, char* argv[]) {
                 //get the process with the smallest rem_exec_time and set it to run pointer
                 run = get_shortest_rem_exec_time_process(head);
 
+            }
+
+            else{
+                break;   // If all process is completed then BREAK out from the while loop
             }
 
             if (run->rem_exec_time != 0){ // If run pointer process is not FINISHED yet, then print the link below
