@@ -90,10 +90,11 @@ int main(int argc, char* argv[]) {
 
     /********************************    CPU     *********************************/
 
-    int num_cpus = 2;  //the argv[] value
+    int num_cpus = 1;  //the argv[] value
 
-    struct cpu cpu_array[num_cpus];
-    // cpu_array = (struct cpu[num_cpus])malloc(num_cpus * sizeof(struct cpu));
+    struct cpu *cpu_array;
+    //struct cpu *ptr_to_cpu_array = cpu_array;//int *p = a; 
+    cpu_array = (struct cpu*)malloc(num_cpus * sizeof(struct cpu));
 
     for (int i=0; i<num_cpus; i++){
 
@@ -108,7 +109,7 @@ int main(int argc, char* argv[]) {
             cpu_array[i].processes[j] = (struct process*)malloc(sizeof(struct process));
         }
 
-        cpu_array[i].cpu_rem_exec_time = calc_remaining_cpu_exec_time(cpu_array[i].cpu_id, cpu_array);
+        cpu_array[i].cpu_rem_exec_time = calc_remaining_cpu_exec_time(cpu_array[i].cpu_id, &cpu_array);
 
     }  
 
@@ -135,6 +136,7 @@ int main(int argc, char* argv[]) {
 
                 run = head; //Pointing to the running process
                 run->cpu_id = 0;  // Assign the only cpu
+                //add_process_to_cpu(run); // Add pointer to the process to the relevant cpu
 
                 printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_id);
 
@@ -194,6 +196,7 @@ int main(int argc, char* argv[]) {
         }
         
         // printf("%d\n", current_time);
+        // printf("\n%d\n", cpu_array[0].cpu_rem_exec_time);
     }
 
     
