@@ -17,10 +17,50 @@ struct process {
     // store CPU id too - -1 for no cpu
 };
 
+
 struct cpu {
     int cpu_id;
     struct process** processes; // NEED to be an array of processes
+    int cpu_rem_exec_time;
 };
+
+int calc_remaining_cpu_exec_time(int cpu_id, struct cpu *cpu_array){
+
+    int cpu_arr_length = sizeof(cpu_array)/sizeof(struct cpu);
+    int cpu_rem_exec_time;
+    for (int i=0; i<cpu_arr_length; i++){
+        if (cpu_id == cpu_array[i].cpu_id){
+
+            if (cpu_array[i].cpu_id==-1){
+                
+                int processes_arr_length = sizeof(cpu_array[i].processes)/sizeof(struct process*);
+                for (int j=0; j<processes_arr_length; j++){ // for every process pointer in processes array
+                    if(cpu_array[i].processes[j] == NULL){    //if process pointer is equal to NULL, i.e. "if no process is allocated yet" 
+                        break; // break to assign cpu_rem_exec_time=0
+                    } 
+                }
+                
+                cpu_rem_exec_time=0;// if cpu_id == -1, then cpu_rem_exec_time=0
+            }
+            else {// else, loop through each process pointer in the cpu's processes array and calculate total rem_exec_time of cpu
+                int cpu_rem_exec_time=0;
+
+                int processes_arr_length = sizeof(cpu_array[i].processes)/sizeof(struct process*);
+                for (int j=0; j<processes_arr_length; j++){ // for every process pointer in processes array
+                cpu_rem_exec_time = cpu_rem_exec_time + cpu_array[i].processes[j]->rem_exec_time; // access the process's rem_exec_time and add to cpu's rem_exec_time
+                }
+            }
+            return cpu_rem_exec_time;
+        }
+        else{
+            printf("\nNO cpu with cpu_id %d\n", cpu_id);
+        }
+    }
+    
+    return 0; // JUST FOR THE SAKE OF STOPPING WARNINGS
+}
+
+
 
 
 // Function that returns smallest element
@@ -129,9 +169,7 @@ struct process* get_shortest_rem_exec_time_process(struct process* head)
     }
 }
 
-int calc_remaining_cpu_exec_time(struct process* cpu){
-    return 0;
-}
+
 
     // struct process* find_lowest_arr_time(struct process* head_ptr) {
 

@@ -36,7 +36,7 @@ void insert_process(struct process** head_ptr, char* process_data) {
    }
 
    new_node->rem_exec_time = new_node->exec_time;
-   new_node->cpu_id = 0;
+   new_node->cpu_id = -1;                           // cpu_id = -1 means no cpu is assigned to the process yet
    new_node->next = NULL;
 
 //    printf("%d\n", new_node->arr_time);
@@ -69,7 +69,8 @@ int main(int argc, char* argv[]) {
 
     int proc_rem = 0;
 
-        
+    /************************  Readinf In File  *********************************/
+
     FILE *fptr;
     if ((fptr = fopen("processes.txt", "r")) == NULL) {
         printf("Error! opening file");
@@ -83,7 +84,11 @@ int main(int argc, char* argv[]) {
         proc_rem++;
     }
 
-    ///////////////////// CPU ///////////////////////
+    /*****************************************************************************/
+
+
+
+    /********************************    CPU     *********************************/
 
     int num_cpus = 2;  //the argv[] value
 
@@ -93,7 +98,7 @@ int main(int argc, char* argv[]) {
     for (int i=0; i<num_cpus; i++){
 
         // cpu_array[i] = malloc(sizeof(struct cpu))
-        cpu_array[i].cpu_id = i-1;  //cpu_id with -1 indicates no CPU
+        cpu_array[i].cpu_id = i-1;  //cpu_id with -1 indicates no CPU 
 
         //NEED TO INITIALISE THE ARRAY OF POINTERS TO STRUCT HERE SOMEHOW
         //Simplify array first to hold all the processes that are there
@@ -103,13 +108,17 @@ int main(int argc, char* argv[]) {
             cpu_array[i].processes[j] = (struct process*)malloc(sizeof(struct process));
         }
 
+        cpu_array[i].cpu_rem_exec_time = calc_remaining_cpu_exec_time(cpu_array[i].cpu_id, cpu_array);
+
     }  
 
-    //////////////////////////////////////////////////
+    /*******************************************************************************/
 
 
     struct process* run; // To point to the running process
 
+
+    /* Main Loop of The Program */
     while (proc_rem != 0){
 
         //run = head; // Because first process always run first
@@ -125,10 +134,9 @@ int main(int argc, char* argv[]) {
             if (head->arr_time == current_time){  // FOR FIRST PROCESS
 
                 run = head; //Pointing to the running process
+                run->cpu_id = 0;  // Assign the only cpu
 
                 printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_id);
-
-                // (head->rem_exec_time)--;
 
             }
             
@@ -137,6 +145,7 @@ int main(int argc, char* argv[]) {
             // Check rem_exec_time of currently arrived process with the running process's rem_exec_time
             if (get_pointer_to_process_equal_to_curr_time(head, current_time)->rem_exec_time < run->rem_exec_time){
                 run = get_pointer_to_process_equal_to_curr_time(head, current_time);
+                run->cpu_id = 0;  // Assign the only cpu
                 printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_id);
             }
             // Else do nothing, i.e. keep run pointer to previous process
@@ -165,6 +174,7 @@ int main(int argc, char* argv[]) {
                 // IF there is a tie between rem times, then break tie using pid
 
                 run = get_shortest_rem_exec_time_process(head);
+                run->cpu_id = 0;  // Assign the only cpu
 
 
             }
