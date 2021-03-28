@@ -17,6 +17,10 @@ struct process {
     // store CPU id too - -1 for no cpu
 };
 
+struct cpu {
+    int cpu_id;
+    struct process** processes; // NEED to be an array of processes
+};
 
 
 // Function that returns smallest element
@@ -87,8 +91,6 @@ bool is_all_process_completed(struct process* head){
     }
     return false;
 
-    
-
 }
 
 // Function to print the second
@@ -127,53 +129,9 @@ struct process* get_shortest_rem_exec_time_process(struct process* head)
     }
 }
 
-// struct process* shortest_rem_exec_time(struct process* head)  // NEED TO SORT OUT TIES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// {
-
-//     struct process* temp = head;
-//     struct process* min_ptr;
-    
-//     // Declare a min variable and initialize
-//     // it with UINT_MAX value.
-//     // UINT_MAX is integer type and its value
-//     // is 32767 or greater.
-//     int min = INT_MAX;
-
-//     //Below code checks if all processes have zero remaining execution time or not
-//     while (temp != NULL){
-//         if (temp->rem_exec_time == 0){
-//             temp = temp->next;
-//         }
-//         else{
-//             break; // breaks out of loop if a non-zero rem_exec_time is seen
-//         }
-//         return NULL;
-//         // if (temp == NULL){
-//         //     return NULL;
-//         // }
-//     }
-  
-//     temp = head; // Resetting temp to head
-//     // Check loop while head not equal to NULL
-//     while (temp != NULL) { // temp->rem_exec_time != 0 is to leave out those processes that have already finished
-
-//         if  (temp->rem_exec_time == 0){
-
-//             temp = temp->next;
-  
-//             // If min is greater then head->data then
-//             // assign value of head->data to min
-//             // otherwise node point to next node.
-//             if (min > (temp->rem_exec_time)) {
-//                 min = temp->rem_exec_time;
-//                 min_ptr = temp;
-//             }
-//             temp = temp->next;
-//         }
-//     }
-//     return min_ptr;
-// }
-
+int calc_remaining_cpu_exec_time(struct process* cpu){
+    return 0;
+}
 
     // struct process* find_lowest_arr_time(struct process* head_ptr) {
 

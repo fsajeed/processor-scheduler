@@ -57,7 +57,6 @@ void insert_process(struct process** head_ptr, char* process_data) {
    }
    temp->next = new_node;
    return;
-
 }
 
 int main(int argc, char* argv[]) {
@@ -69,6 +68,7 @@ int main(int argc, char* argv[]) {
     char line[1000]; // use malloc later
 
     int proc_rem = 0;
+
         
     FILE *fptr;
     if ((fptr = fopen("processes.txt", "r")) == NULL) {
@@ -83,6 +83,30 @@ int main(int argc, char* argv[]) {
         proc_rem++;
     }
 
+    ///////////////////// CPU ///////////////////////
+
+    int num_cpus = 2;  //the argv[] value
+
+    struct cpu cpu_array[num_cpus];
+    // cpu_array = (struct cpu[num_cpus])malloc(num_cpus * sizeof(struct cpu));
+
+    for (int i=0; i<num_cpus; i++){
+
+        // cpu_array[i] = malloc(sizeof(struct cpu))
+        cpu_array[i].cpu_id = i-1;  //cpu_id with -1 indicates no CPU
+
+        //NEED TO INITIALISE THE ARRAY OF POINTERS TO STRUCT HERE SOMEHOW
+        //Simplify array first to hold all the processes that are there
+        cpu_array[i].processes = (struct process**)malloc(proc_rem * sizeof(struct process*)); 
+
+        for (int j=0; j<proc_rem; j++){
+            cpu_array[i].processes[j] = (struct process*)malloc(sizeof(struct process));
+        }
+
+    }  
+
+    //////////////////////////////////////////////////
+
 
     struct process* run; // To point to the running process
 
@@ -91,6 +115,12 @@ int main(int argc, char* argv[]) {
         //run = head; // Because first process always run first
 
         if (search(head, current_time))/* Check if any process arrived at current time */{
+
+            //CHECK IF THERE ARE OTHER PROCESSES ARRIVING AT THIS CURRENT TIME, i.e. search for duplicate arr_time
+            //Put the duplicate ones in another Linked List
+            //If there is, then loop through LL to find the one with lowest rem_exec_time, i.e. code below and set run pointer on it
+                                                                      //if duplicate 
+            //else {the below code will run} 
 
             if (head->arr_time == current_time){  // FOR FIRST PROCESS
 
@@ -131,7 +161,11 @@ int main(int argc, char* argv[]) {
             if(!is_all_process_completed(head)){   /*If All process's rem_exec_time is not equal to zero, i.e. if all processes did not complete yet*/
                 // printf("\nALL PROCESS DID NOT COMPLETE\n");
                 //get the process with the smallest rem_exec_time and set it to run pointer
+
+                // IF there is a tie between rem times, then break tie using pid
+
                 run = get_shortest_rem_exec_time_process(head);
+
 
             }
 
@@ -143,8 +177,8 @@ int main(int argc, char* argv[]) {
                 printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_id);
             }
 
-            (run->rem_exec_time)--; //This increment needs to be added again for the unique case after a process finishes
-            current_time++;         //This decrement needs to be added again for the unique case after a process finishes
+            // (run->rem_exec_time)--; //This increment needs to be added again for the unique case after a process finishes
+            // current_time++;         //This decrement needs to be added again for the unique case after a process finishes
 
             
         }
