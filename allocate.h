@@ -3,6 +3,8 @@
 #include <limits.h>
 #include <stdbool.h>
 
+#define CPU_ARR_LENGTH 1
+
 struct process {
     int arr_time;                // make unsigned long int
     int pid;      // make unsigned long int
@@ -10,7 +12,7 @@ struct process {
     char *parallelisability;     // Not sure if needed for now // need to conver to just character later
 
     int rem_exec_time;
-    int cpu_id;
+    struct cpu *cpu_ptr;  // Should contain the reference/pointer to the CPU
 
     struct process *next; // Pointer pointing to the next process stored in the Linked List
 
@@ -20,49 +22,194 @@ struct process {
 
 struct cpu {
     int cpu_id;
-    struct process** processes; // NEED to be an array of processes
+    struct process* processes[4]; // NEED to be an array of processes
     int cpu_rem_exec_time;
 };
 
-int calc_remaining_cpu_exec_time(int cpu_id, struct cpu **cpu_array){
 
-    int cpu_arr_length = sizeof(*cpu_array)/sizeof(struct cpu);
-    int cpu_rem_exec_time;
+
+// int calc_remaining_cpu_exec_time(int cpu_id, struct cpu **cpu_array){
+
+//     int cpu_arr_length = sizeof(*cpu_array)/sizeof(struct cpu);
+//     int cpu_rem_exec_time;
+//     for (int i=0; i<cpu_arr_length; i++){
+//         if (cpu_id == (*cpu_array)[i].cpu_id){  // If cpu with this id is found
+
+//             if ((*cpu_array)[i].cpu_id==-1){
+                
+//                 int processes_arr_length = sizeof((*cpu_array)[i].processes)/sizeof(struct process*);
+//                 for (int j=0; j<processes_arr_length; j++){ // for every process pointer in processes array
+//                     if((*cpu_array)[i].processes[j] == NULL){    //if process pointer is equal to NULL, i.e. "if no process is allocated yet" 
+//                         break; // break to assign cpu_rem_exec_time=0
+//                     } 
+//                 }
+                
+//                 cpu_rem_exec_time=0;// if cpu_id == -1, then cpu_rem_exec_time=0
+//             }
+//             else {// else, loop through each process pointer in the cpu's processes array and calculate total rem_exec_time of cpu
+//                 int cpu_rem_exec_time=0;
+
+//                 if ((*cpu_array)[i]) // CHECKS IF THERE ARE ANY PROCESSES IN THE PROCESS LIST OF THE CPU
+//                 int processes_arr_length = sizeof((*cpu_array)[i].processes)/sizeof(struct process*);
+//                 // printf("%d\n", processes_arr_length);
+//                 for (int j=0; j<processes_arr_length; j++){ // for every process pointer in processes array
+//                 cpu_rem_exec_time = cpu_rem_exec_time + (*cpu_array)[i].processes[j]->rem_exec_time; // access the process's rem_exec_time and add to cpu's rem_exec_time
+//                 }
+//             }
+//             return cpu_rem_exec_time;
+//         }
+//         else{
+//             printf("\nNO cpu with cpu_id %d\n", cpu_id);
+//         }
+//     }
+    
+//     return 0; // JUST FOR THE SAKE OF STOPPING WARNINGS
+// }
+
+//SHOULD ADD THE PROCESS TO THE CPU
+// AND ALSO, ADD THE CPU TO THE PROCESS
+void add_process_to_cpu(struct process* process, struct cpu **cpu_array) {
+    // Check which CPU's remaining execution time is lowest, and assign to that CPU
+    // If tie between remainig times, then check CPU ids of tied ones
+    // Assign to the one with smallest cpu_id
+
+    int cpu_arr_length = CPU_ARR_LENGTH; // it can also be argv[x]
+    int min = INT_MAX;
+    // int cpu_time;
+    struct cpu* min_ptr;
     for (int i=0; i<cpu_arr_length; i++){
-        if (cpu_id == (*cpu_array)[i].cpu_id){
 
-            if ((*cpu_array)[i].cpu_id==-1){
-                
-                int processes_arr_length = sizeof((*cpu_array)[i].processes)/sizeof(struct process*);
-                for (int j=0; j<processes_arr_length; j++){ // for every process pointer in processes array
-                    if((*cpu_array)[i].processes[j] == NULL){    //if process pointer is equal to NULL, i.e. "if no process is allocated yet" 
-                        break; // break to assign cpu_rem_exec_time=0
-                    } 
-                }
-                
-                cpu_rem_exec_time=0;// if cpu_id == -1, then cpu_rem_exec_time=0
-            }
-            else {// else, loop through each process pointer in the cpu's processes array and calculate total rem_exec_time of cpu
-                int cpu_rem_exec_time=0;
+        // cpu_time = calc_remaining_cpu_exec_time((*cpu_array)[i].cpu_id, cpu_array);
 
-                int processes_arr_length = sizeof((*cpu_array)[i].processes)/sizeof(struct process*);
-                for (int j=0; j<processes_arr_length; j++){ // for every process pointer in processes array
-                cpu_rem_exec_time = cpu_rem_exec_time + (*cpu_array)[i].processes[j]->rem_exec_time; // access the process's rem_exec_time and add to cpu's rem_exec_time
-                }
-            }
-            return cpu_rem_exec_time;
+        if ((*cpu_array)[i].cpu_rem_exec_time < min){
+            min = (*cpu_array)[i].cpu_rem_exec_time;
+            min_ptr = &((*cpu_array)[i]); // Get the pointer to the CPU
         }
-        else{
-            printf("\nNO cpu with cpu_id %d\n", cpu_id);
+        else if ((*cpu_array)[i].cpu_rem_exec_time == min){ // RESOLVE TIES WITH SAME CPU REMAINING EXECUTION TIME (This case will not happen until the value for the first CPU is calculated)
+            // CHECK POINTER OF PREVIOUS CPU i.e. using i-1
+            // CHECK FOR CPU WITH LOWEST CPU ID
+            if ((*cpu_array)[i].cpu_id > (*cpu_array)[i-1].cpu_id){
+                //Put process in cpu with smaller cpu_id, i.e. i-1
+                min_ptr = &((*cpu_array)[i-1]);
+            }
+            else{
+                min_ptr = &((*cpu_array)[i]);
+            }
+        }
+        else if ((*cpu_array)[i].cpu_rem_exec_time > min){
+            // Do Nothing - because you do not add it to the cpu with higher cpu_time than the one with lower one
+        }
+
+    }
+
+    process->cpu_ptr = min_ptr;     //Add the cpu pointer to the process
+
+    // int proc_arr_len = sizeof(min_ptr->processes)/sizeof(struct process*);
+    // struct processes** processes_new = (struct process**)realloc(min_ptr->processes, sizeof(struct process*)*(proc_arr_len + 1));
+    //min_ptr->processes = realloc(min_ptr->processes, sizeof(struct process*)*(proc_arr_len + 1));
+    //min_ptr->processes[proc_arr_len] = process;         // Add the process pointer to the processes array in the CPU
+
+    for (int j=0; j<4; j++){
+        if ((min_ptr->processes)[j] == NULL){
+            (min_ptr->processes)[j] = process;
+            break;
         }
     }
     
-    return 0; // JUST FOR THE SAKE OF STOPPING WARNINGS
+    return;
 }
 
-// void add_process_to_cpu(struct process*, struct cpu *cpu_array[]) {
+// int calc_remaining_cpu_exec_time(int cpu_id, struct cpu **cpu_array){
+
+//     int cpu_arr_length = sizeof(*cpu_array)/sizeof(struct cpu);
+//     int cpu_rem_exec_time;
+//     for (int i=0; i<cpu_arr_length; i++){
+//         if (cpu_id == (*cpu_array)[i].cpu_id){  // If cpu with this id is found
+
+//             if ((*cpu_array)[i].cpu_id==-1){
+                
+//                 int processes_arr_length = sizeof((*cpu_array)[i].processes)/sizeof(struct process*);
+//                 for (int j=0; j<processes_arr_length; j++){ // for every process pointer in processes array
+//                     if((*cpu_array)[i].processes[j] == NULL){    //if process pointer is equal to NULL, i.e. "if no process is allocated yet" 
+//                         break; // break to assign cpu_rem_exec_time=0
+//                     } 
+//                 }
+                
+//                 cpu_rem_exec_time=0;// if cpu_id == -1, then cpu_rem_exec_time=0
+//             }
+//             else {// else, loop through each process pointer in the cpu's processes array and calculate total rem_exec_time of cpu
+//                 int cpu_rem_exec_time=0;
+
+//                 if ((*cpu_array)[i]) // CHECKS IF THERE ARE ANY PROCESSES IN THE PROCESS LIST OF THE CPU
+//                 int processes_arr_length = sizeof((*cpu_array)[i].processes)/sizeof(struct process*);
+//                 // printf("%d\n", processes_arr_length);
+//                 for (int j=0; j<processes_arr_length; j++){ // for every process pointer in processes array
+//                 cpu_rem_exec_time = cpu_rem_exec_time + (*cpu_array)[i].processes[j]->rem_exec_time; // access the process's rem_exec_time and add to cpu's rem_exec_time
+//                 }
+//             }
+//             return cpu_rem_exec_time;
+//         }
+//         else{
+//             printf("\nNO cpu with cpu_id %d\n", cpu_id);
+//         }
+//     }
     
+//     return 0; // JUST FOR THE SAKE OF STOPPING WARNINGS
 // }
+
+// //SHOULD ADD THE PROCESS TO THE CPU
+// // AND ALSO, ADD THE CPU TO THE PROCESS
+// void add_process_to_cpu(struct process* process, struct cpu **cpu_array) {
+//     // Check which CPU's remaining execution time is lowest, and assign to that CPU
+//     // If tie between remainig times, then check CPU ids of tied ones
+//     // Assign to the one with smallest cpu_id
+
+//     int cpu_arr_length = sizeof(*cpu_array)/sizeof(struct cpu); // it can also be argv[x]
+//     int min = INT_MAX;
+//     int cpu_time;
+//     struct cpu* min_ptr;
+//     for (int i=0; i<cpu_arr_length; i++){
+
+//         cpu_time = calc_remaining_cpu_exec_time((*cpu_array)[i].cpu_id, cpu_array);
+
+//         if (cpu_time < min){
+//             min = cpu_time;
+//             min_ptr = &((*cpu_array)[i]); // Get the pointer to the CPU
+//         }
+//         else if (cpu_time == min){ // RESOLVE TIES WITH SAME CPU REMAINING EXECUTION TIME (This case will not happen until the value for the first CPU is calculated)
+//             // CHECK POINTER OF PREVIOUS CPU i.e. using i-1
+//             // CHECK FOR CPU WITH LOWEST CPU ID
+//             if ((*cpu_array)[i].cpu_id > (*cpu_array)[i-1].cpu_id){
+//                 //Put process in cpu with smaller cpu_id, i.e. i-1
+//                 min_ptr = &((*cpu_array)[i-1]);
+//             }
+//             else{
+//                 min_ptr = &((*cpu_array)[i]);
+//             }
+//         }
+//         else if (cpu_time > min){
+//             // Do Nothing - because you do not add it to the cpu with higher cpu_time than the one with lower one
+//         }
+
+//     }
+
+//     process->cpu_ptr = min_ptr;     //Add the cpu pointer to the process
+
+//     int proc_arr_len = sizeof(min_ptr->processes)/sizeof(struct process*);
+//     // struct processes** processes_new = (struct process**)realloc(min_ptr->processes, sizeof(struct process*)*(proc_arr_len + 1));
+//     min_ptr->processes = realloc(min_ptr->processes, sizeof(struct process*)*(proc_arr_len + 1));
+//     min_ptr->processes[proc_arr_len] = process;         // Add the process pointer to the processes array in the CPU
+    
+//     return;
+// }
+
+//void add_cpu_to_process(struct cpu* cpu, struct process *process) {
+    // Check which CPU's remaining execution time is lowest, and assign to that CPU
+    // If tie between remainig times, then check CPU ids of tied ones
+    // Assign to the one with smallest cpu_id
+
+
+//}
 
 
 
