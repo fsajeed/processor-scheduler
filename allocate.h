@@ -109,8 +109,28 @@ struct process* get_process_with_smallest_rem_time_breaking_ties(struct process*
     return min_ptr;
 }
 
-bool has_same_arrival_times(struct process* head) {
-    return true;
+
+// Function to check if there are processes with same arrival times in the Linked List
+bool has_same_arrival_times(struct process* head)
+{
+    while (head->next != NULL) {
+  
+        // Starting from the next node
+        struct process* ptr = head->next;
+        while (ptr != NULL) {
+  
+            // If some duplicate node is found
+            if (head->arr_time == ptr->arr_time) {
+                return true;
+                // break;
+            }
+            ptr = ptr->next;
+        }
+  
+        head = head->next;
+    }
+
+    return false;
 }
 
 
