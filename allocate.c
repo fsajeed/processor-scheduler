@@ -39,12 +39,6 @@ void insert_process(struct process** head_ptr, char* process_data) {
    new_node->cpu_ptr = NULL;                           // cpu_id = -1 means no cpu is assigned to the process yet
    new_node->next = NULL;
 
-//    printf("%d\n", new_node->arr_time);
-//    printf("%d\n", new_node->pid);
-//    printf("%d\n", new_node->exec_time);
-//    printf("%s\n", new_node->parallelisability);
-//    printf("%p\n", new_node->next);                // Confusion on this output
-//    printf("\n");
 
    if (*head_ptr == NULL){
        *head_ptr = new_node;
@@ -133,30 +127,25 @@ int main(int argc, char* argv[]) {
     /* Main Loop of The Program */
     while (proc_rem != 0){
 
-        //run = head; // Because first process always run first
-
-        if (search(head, current_time))/* Check if any process arrived at current time */{
+        /* Check if any process arrived at current time */
+        if (search(head, current_time)) {
 
             //CHECK IF THERE ARE OTHER PROCESSES ARRIVING AT THIS CURRENT TIME, i.e. search for duplicate arr_time
             //Put the duplicate ones in another Linked List
-            //If there is, then loop through LL to find the one with lowest rem_exec_time, i.e. code below and set run pointer on it
-                                                                      //if duplicate 
+            //If there is, then loop through LL to find the one with lowest rem_exec_time
+            //If there is a tie, break tie using pid and assign run pointer
             //else {the below code will run} 
 
-            if (head->arr_time == current_time){  // FOR FIRST PROCESS
-
-                run = head; //Pointing to the running process
-                //(run->cpu_ptr) = 0;  // Assign the only cpu
-
-                
-                add_process_to_cpu(run, &cpu_array); // Add pointer to the process to the relevant cpu
-                // run->cpu_ptr->cpu_rem_exec_time = (run->cpu_ptr->cpu_rem_exec_time) + (run->rem_exec_time); //Updating the cpu's remaining execution time
-
-                printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id);
-                // printf("CPU = %d , CPU_REM_EXEC_TIME = %d\n", run->cpu_ptr->cpu_id, run->cpu_ptr->cpu_rem_exec_time);
+            if (){
 
             }
-            
+
+            // if (head->arr_time == current_time){  // FOR FIRST PROCESS
+            //     run = head; //Pointing to the running process
+            //     add_process_to_cpu(run, &cpu_array); // Add pointer to the process to the relevant cpu
+            //     printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id);
+            //     // printf("CPU = %d , CPU_REM_EXEC_TIME = %d\n", run->cpu_ptr->cpu_id, run->cpu_ptr->cpu_rem_exec_time);
+            // }
             
             //Below code is for any other process except for the first one
 
@@ -170,18 +159,12 @@ int main(int argc, char* argv[]) {
             // Check rem_exec_time of currently arrived process with the running process's rem_exec_time
             if (get_pointer_to_process_equal_to_curr_time(head, current_time)->rem_exec_time < run->rem_exec_time){
                 run = get_pointer_to_process_equal_to_curr_time(head, current_time);
-
-                
                 add_process_to_cpu(run, &cpu_array); // Add pointer to the process to the relevant cpu
-                // run->cpu_ptr->cpu_rem_exec_time = (run->cpu_ptr->cpu_rem_exec_time) + (run->rem_exec_time); //Updating the cpu's remaining execution time
 
                 printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id);
                 // printf("CPU = %d , CPU_REM_EXEC_TIME = %d\n", run->cpu_ptr->cpu_id, run->cpu_ptr->cpu_rem_exec_time);
             }
-            // Else do nothing, i.e. keep run pointer to previous process
-            
-
-
+            // Else do nothing, i.e. keep run pointer to previous process            
         }
 
 
