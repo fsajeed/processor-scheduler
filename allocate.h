@@ -24,6 +24,7 @@ struct cpu {
     int cpu_id;
     struct process* processes[4]; // NEED to be an array of processes
     int cpu_rem_exec_time;
+    // IDEA OF HAVING A RUN POINTER
 };
 
 
@@ -102,19 +103,16 @@ void add_process_to_cpu(struct process* process, struct cpu **cpu_array) {
 
     }
 
-    process->cpu_ptr = min_ptr;     //Add the cpu pointer to the process
-
-    // int proc_arr_len = sizeof(min_ptr->processes)/sizeof(struct process*);
-    // struct processes** processes_new = (struct process**)realloc(min_ptr->processes, sizeof(struct process*)*(proc_arr_len + 1));
-    //min_ptr->processes = realloc(min_ptr->processes, sizeof(struct process*)*(proc_arr_len + 1));
-    //min_ptr->processes[proc_arr_len] = process;         // Add the process pointer to the processes array in the CPU
+    min_ptr->cpu_rem_exec_time = (min_ptr->cpu_rem_exec_time) + (process->rem_exec_time); //Updating the allocated cpu's remaining execution time
 
     for (int j=0; j<4; j++){
         if ((min_ptr->processes)[j] == NULL){
-            (min_ptr->processes)[j] = process;
+            (min_ptr->processes)[j] = process; // Add the process to the cpu processes list
             break;
         }
     }
+
+    process->cpu_ptr = min_ptr;     //Add the cpu pointer to the process
     
     return;
 }

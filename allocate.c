@@ -125,7 +125,9 @@ int main(int argc, char* argv[]) {
     /*******************************************************************************/
 
 
-    struct process* run; // To point to the running process
+    struct process* run = NULL; // To point to the running process
+    // printf("%p\n",run);
+    // struct process* run2; // For second processor
 
 
     /* Main Loop of The Program */
@@ -148,23 +150,33 @@ int main(int argc, char* argv[]) {
 
                 
                 add_process_to_cpu(run, &cpu_array); // Add pointer to the process to the relevant cpu
-                run->cpu_ptr->cpu_rem_exec_time = (run->cpu_ptr->cpu_rem_exec_time) + (run->rem_exec_time); //Updating the cpu's remaining execution time
+                // run->cpu_ptr->cpu_rem_exec_time = (run->cpu_ptr->cpu_rem_exec_time) + (run->rem_exec_time); //Updating the cpu's remaining execution time
 
                 printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id);
+                // printf("CPU = %d , CPU_REM_EXEC_TIME = %d\n", run->cpu_ptr->cpu_id, run->cpu_ptr->cpu_rem_exec_time);
 
             }
             
             
             //Below code is for any other process except for the first one
+
+            // Check if any CPU is free i.e. has zero cpu_rem_exec_time to accommodate the process
+            // for (int i=0; i<CPU_ARR_LENGTH; i++){
+            //     if (cpu_array[i].cpu_rem_exec_time == 0){
+            //         run2 = get_pointer_to_process_equal_to_curr_time(head, current_time);
+            //     }
+            // }
+
             // Check rem_exec_time of currently arrived process with the running process's rem_exec_time
             if (get_pointer_to_process_equal_to_curr_time(head, current_time)->rem_exec_time < run->rem_exec_time){
                 run = get_pointer_to_process_equal_to_curr_time(head, current_time);
 
                 
                 add_process_to_cpu(run, &cpu_array); // Add pointer to the process to the relevant cpu
-                run->cpu_ptr->cpu_rem_exec_time = (run->cpu_ptr->cpu_rem_exec_time) + (run->rem_exec_time); //Updating the cpu's remaining execution time
+                // run->cpu_ptr->cpu_rem_exec_time = (run->cpu_ptr->cpu_rem_exec_time) + (run->rem_exec_time); //Updating the cpu's remaining execution time
 
                 printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id);
+                // printf("CPU = %d , CPU_REM_EXEC_TIME = %d\n", run->cpu_ptr->cpu_id, run->cpu_ptr->cpu_rem_exec_time);
             }
             // Else do nothing, i.e. keep run pointer to previous process
             
@@ -173,14 +185,24 @@ int main(int argc, char* argv[]) {
         }
 
 
+/************************************************* DECREMENT SECTION **********************************************************/
+
         // If there is no process for which the current time now is not equal to its arr_time, then below code will run
         (run->rem_exec_time)--; //To decrement the running process's execution time
+        (run->cpu_ptr->cpu_rem_exec_time)--; //To decrement the occupied process's rem execution time
         current_time++;
         // printf("\n%d\n", run->rem_exec_time);
+
+/******************************************************************************************************************************/
+
+
+/************************************************* CHECK IF PROCESS ENDED SECTION **********************************************************/
 
         if ((run->rem_exec_time == 0)){
             proc_rem--;
             printf("%d,FINISHED,pid=%d,proc_remaining=%d\n", current_time, run->pid, proc_rem);
+            //run->cpu_ptr = NULL; //Need to remove from CPU after process have finished
+            // printf("CPU = %d , CPU_REM_EXEC_TIME = %d\n", run->cpu_ptr->cpu_id, run->cpu_ptr->cpu_rem_exec_time);
 
             // CHECK AGAIN HERE TO SET THE PROCESS WITH THE SHORTEST EXECUTION TIME
             //Traverse trough LL from head to find node with lowest rem_exec_time and set it to the run pointer
@@ -192,10 +214,8 @@ int main(int argc, char* argv[]) {
                 // IF there is a tie between rem times, then break tie using pid
 
                 run = get_shortest_rem_exec_time_process(head);
-
-                
                 add_process_to_cpu(run, &cpu_array); // Add pointer to the process to the relevant cpu
-                run->cpu_ptr->cpu_rem_exec_time = (run->cpu_ptr->cpu_rem_exec_time) + (run->rem_exec_time); //Updating the cpu's remaining execution time
+                // run->cpu_ptr->cpu_rem_exec_time = (run->cpu_ptr->cpu_rem_exec_time) + (run->rem_exec_time); //Updating the cpu's remaining execution time
 
             }
 
@@ -205,6 +225,7 @@ int main(int argc, char* argv[]) {
 
             if (run->rem_exec_time != 0){ // If run pointer process is not FINISHED yet, then print the link below
                 printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id);
+                // printf("CPU = %d , CPU_REM_EXEC_TIME = %d\n", run->cpu_ptr->cpu_id, run->cpu_ptr->cpu_rem_exec_time);
             }
 
             // (run->rem_exec_time)--; //This increment needs to be added again for the unique case after a process finishes
@@ -212,10 +233,10 @@ int main(int argc, char* argv[]) {
 
             
         }
-        
-        // printf("%d\n", current_time);
-        // printf("\n%d\n", cpu_array[0].cpu_rem_exec_time);
-    }
+/******************************************************************************************************************************/
+
+
+    }  // MAIN LOOP ENDS
 
     
     fclose(fptr);
