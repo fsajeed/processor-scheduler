@@ -121,7 +121,6 @@ int main(int argc, char* argv[]) {
     struct process* run = NULL; // To point to the running process
     // printf("%p\n",run);
     // struct process* run2; // For second processor
-    // struct process* arr_time_head = NULL;
 
     /* Main Loop of The Program */
     while (proc_rem != 0){
@@ -131,11 +130,25 @@ int main(int argc, char* argv[]) {
             //CHECK IF THERE ARE OTHER PROCESSES ARRIVING AT THIS CURRENT TIME, i.e. search for duplicate arr_time
             if (has_same_arrival_times(head)){
 
-                // arr_time_head = get_arrival_times_list(head, current_time); // LOADING THE PREVIOUSLY DECLARED arr_time_head
-                // printList(arr_time_head);
-                run = get_process_with_smallest_rem_time_accounting_for_duplicates(head, current_time);
-                add_process_to_cpu(run, &cpu_array);
-                printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id);
+                /*******************************************************************************/
+                if (run != NULL){
+                    if( get_process_with_smallest_rem_time_accounting_for_duplicates(head, current_time)->rem_exec_time < run->rem_exec_time ){
+                        run = get_process_with_smallest_rem_time_accounting_for_duplicates(head, current_time);
+                        add_process_to_cpu(run, &cpu_array);
+                        printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id);
+                    }
+                    else {
+                        // DO NOTHING, i.e. keep runnig the process that is already running
+                    } 
+                }
+                else{
+                    run = get_process_with_smallest_rem_time_accounting_for_duplicates(head, current_time);
+                    add_process_to_cpu(run, &cpu_array);
+                    printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id);
+                }
+                /*******************************************************************************/
+
+                
             }
             //Put the duplicate ones in another Linked List
             //If there is, then loop through LL to find the one with lowest rem_exec_time
