@@ -77,7 +77,7 @@ void add_process_to_cpu(struct process* process, struct cpu **cpu_array){
 
 
 // Returns pointer to process with the smallest remaiing execution time, after breaking ties with pid
-struct process* get_process_with_smallest_rem_time(struct process* head)   
+struct process* get_process_with_smallest_rem_time_breaking_ties(struct process* head)   
 {
     struct process* temp = head;
     struct process* min_ptr;
@@ -89,25 +89,28 @@ struct process* get_process_with_smallest_rem_time(struct process* head)
   
     // Check loop while head not equal to NULL
     while (temp != NULL) {
-        // If min is greater than temp->arr_time then
-        // assign value of temp->arr_time to min
-        // otherwise node point to next node.
-        if (min > (temp->rem_exec_time)){
-            min = temp->rem_exec_time;
-            min_ptr = temp;
-        }
-        //BREAK TIE USING PID WHEN min value is same as the current process's rem_exec_time
-        else if (min == temp->rem_exec_time){
-            if(min_ptr->pid > temp->pid) {
+        if (temp->rem_exec_time != 0) { // SKIP THE PROCESS THAT HAS FINISHED
+            if (min > (temp->rem_exec_time)){
+                min = temp->rem_exec_time;
                 min_ptr = temp;
             }
-            else {
-                // DO NOTHING - min_ptr will not be changed as it already has the lowest pid among the two
+            //BREAK TIE USING PID WHEN min value is same as the current process's rem_exec_time
+            else if (min == temp->rem_exec_time){
+                if(min_ptr->pid > temp->pid) {
+                    min_ptr = temp;
+                }
+                else {
+                    // DO NOTHING - min_ptr will not be changed as it already has the lowest pid among the two
+                }
             }
         }
         temp = temp->next;
     }
     return min_ptr;
+}
+
+bool has_same_arrival_times(struct process* head) {
+    return true;
 }
 
 
