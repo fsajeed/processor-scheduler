@@ -24,6 +24,14 @@ struct cpu {
     // IDEA OF HAVING A RUN POINTER
 };
 
+void printList(struct process* p)
+{
+    while (p != NULL) {
+        printf("\n%d\n", p->arr_time);
+        p = p->next;
+    }
+}
+
 
 //SHOULD ADD THE PROCESS TO THE CPU
 // AND ALSO, ADD THE CPU TO THE PROCESS
@@ -75,6 +83,41 @@ void add_process_to_cpu(struct process* process, struct cpu **cpu_array){
     return;
 }
 
+// Returns pointer to process with the smallest remaiing execution time, after breaking ties with pid
+struct process* get_process_with_smallest_rem_time_accounting_for_duplicates(struct process* head, int current_time)   
+{
+    struct process* temp = head;
+    struct process* min_ptr;
+    // Declare a min variable and initialize
+    // it with UINT_MAX value.
+    // UINT_MAX is integer type and its value
+    // is 32767 or greater.
+    int min = INT_MAX;
+  
+    // Check loop while head not equal to NULL
+    while (temp != NULL) {
+        if (temp->rem_exec_time != 0) { // SKIP THE PROCESS THAT HAS FINISHED
+            if (temp->arr_time == current_time){   // SKIP THE PROCESS THAT DID NOT ARRIVE AT THE CURRENT TIME
+                if (min > (temp->rem_exec_time)){
+                    min = temp->rem_exec_time;
+                    min_ptr = temp;
+                }
+                //BREAK TIE USING PID WHEN min value is same as the current process's rem_exec_time
+                else if (min == temp->rem_exec_time){
+                    if(min_ptr->pid > temp->pid) {
+                        min_ptr = temp;
+                    }
+                    else {
+                        // DO NOTHING - min_ptr will not be changed as it already has the lowest pid among the two
+                    }
+                }
+            }
+        }
+        temp = temp->next;
+    }
+    return min_ptr;
+}
+
 
 // Returns pointer to process with the smallest remaiing execution time, after breaking ties with pid
 struct process* get_process_with_smallest_rem_time_breaking_ties(struct process* head)   
@@ -108,6 +151,7 @@ struct process* get_process_with_smallest_rem_time_breaking_ties(struct process*
     }
     return min_ptr;
 }
+
 
 
 // Function to check if there are processes with same arrival times in the Linked List
@@ -396,4 +440,78 @@ struct process* get_shortest_rem_exec_time_process(struct process* head)
 //     }
     
 //     return 0; // JUST FOR THE SAKE OF STOPPING WARNINGS
+// }
+
+
+
+// // Function that returns a linked list of processes with same arrival times
+// void get_arrival_times_list(struct process* head, int time, struct process** list_head)
+// {
+//     // int count = 0;
+//     (*list_head) = NULL;
+//     struct process* temp;
+  
+//     while (head->next != NULL) {
+  
+//         // Starting from the next node
+//         struct process* ptr = head->next;
+//         while (ptr != NULL) {
+  
+//             // If some duplicate arrival times are found
+//             if (head->arr_time == ptr->arr_time) {
+
+//                 if ((*list_head) == NULL){
+//                     (*list_head) = head; 
+//                     (*list_head)->next = NULL;
+//                 }
+
+//                 else if ((*list_head) != NULL){
+//                     temp = (*list_head);
+//                     while (temp->next != NULL) {
+//                         temp = temp->next;
+//                     }
+//                     temp->next = head;
+//                 }
+
+//                 break;
+//             }
+
+//             ptr = ptr->next;
+//         }
+
+//         head = head->next;
+//     }
+
+//     // return count;
+// }
+
+
+// // Function that returns a linked list of processes with same arrival times
+// struct process* get_arrival_times_list(struct process* head, int time)
+// {
+//     struct process* list_head = NULL;
+//     struct process* temp;
+  
+//     while (head != NULL) {
+    
+//         // If some duplicate arrival times are found
+//         if (head->arr_time == time) {
+
+//             if (list_head == NULL){
+//                 list_head = head; 
+//                 list_head->next = NULL;
+//             }
+
+//             else if (list_head != NULL){
+//                 temp = list_head;
+//                 while (temp->next != NULL) {
+//                     temp = temp->next;
+//                 }
+//                 temp->next = head;
+//                 temp->next->next = NULL; // Making sure the last node do not point to anything
+//             }
+//         }
+//         head = head->next;
+//     }
+//     return list_head;
 // }

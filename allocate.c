@@ -90,7 +90,6 @@ int main(int argc, char* argv[]) {
     struct cpu *cpu_array;
     //struct cpu *ptr_to_cpu_array = cpu_array;//int *p = a; 
     cpu_array = (struct cpu*)malloc(num_cpus * sizeof(struct cpu));
-    // SEG FAULT HERE
     for (int i=0; i<num_cpus; i++){
 
         // cpu_array[i] = malloc(sizeof(struct cpu))
@@ -122,7 +121,6 @@ int main(int argc, char* argv[]) {
     struct process* run = NULL; // To point to the running process
     // printf("%p\n",run);
     // struct process* run2; // For second processor
-
     // struct process* arr_time_head = NULL;
 
     /* Main Loop of The Program */
@@ -130,10 +128,12 @@ int main(int argc, char* argv[]) {
 
         /* Check if any process arrived at current time */
         if (search(head, current_time)) {
-
             //CHECK IF THERE ARE OTHER PROCESSES ARRIVING AT THIS CURRENT TIME, i.e. search for duplicate arr_time
             if (has_same_arrival_times(head)){
-                run = get_process_with_smallest_rem_time_breaking_ties(head);
+
+                // arr_time_head = get_arrival_times_list(head, current_time); // LOADING THE PREVIOUSLY DECLARED arr_time_head
+                // printList(arr_time_head);
+                run = get_process_with_smallest_rem_time_accounting_for_duplicates(head, current_time);
                 add_process_to_cpu(run, &cpu_array);
                 printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id);
             }
