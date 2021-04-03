@@ -3,7 +3,8 @@
 #include <limits.h>
 #include <stdbool.h>
 
-#define CPU_ARR_LENGTH 2
+#define CPU_ARR_LENGTH 1
+#define PROCESSES_ARR_LENGTH 10
 
 struct process {
     int arr_time;               // make unsigned long int
@@ -19,13 +20,13 @@ struct process {
 
 struct cpu {
     int cpu_id;
-    struct process* processes[4]; // NEED to be an array of pointer to processes
+    struct process* processes[PROCESSES_ARR_LENGTH]; // NEED to be an array of pointer to processes
     int cpu_rem_exec_time;
     struct process* running_process_ptr; // Pointer to the process that the CPU is currently running
 };
 
 
-//SHOULD ADD THE PROCESS TO THE CPU
+// SHOULD ADD THE PROCESS TO THE CPU
 // AND ALSO, ADD THE CPU TO THE PROCESS
 void add_process_to_cpu(struct process* process, struct cpu **cpu_array){
     // Check which CPU's remaining execution time is lowest, and assign to that CPU
@@ -36,6 +37,7 @@ void add_process_to_cpu(struct process* process, struct cpu **cpu_array){
     int min = INT_MAX;
     // int cpu_time;
     struct cpu* min_ptr;
+
     for (int i=0; i<cpu_arr_length; i++){
 
         // cpu_time = calc_remaining_cpu_exec_time((*cpu_array)[i].cpu_id, cpu_array);
@@ -63,12 +65,15 @@ void add_process_to_cpu(struct process* process, struct cpu **cpu_array){
 
     min_ptr->cpu_rem_exec_time = (min_ptr->cpu_rem_exec_time) + (process->rem_exec_time); //Updating the allocated cpu's remaining execution time
 
-    for (int j=0; j<4; j++){
+
+    for (int j=0; j<PROCESSES_ARR_LENGTH; j++){
         if ((min_ptr->processes)[j] == NULL){
             (min_ptr->processes)[j] = process; // Add the process to the cpu processes list
             break;
         }
     }
+
+    min_ptr->running_process_ptr = process;
 
     process->cpu_ptr = min_ptr;     //Add the cpu pointer to the process
     
@@ -111,7 +116,7 @@ struct process* get_process_with_smallest_rem_time_accounting_for_duplicates(str
 }
 
 
-// Returns pointer to process with the smallest remaiing execution time, after breaking ties with pid
+// Returns pointer to process with the smallest remaining execution time, after breaking ties with pid
 struct process* get_process_with_smallest_rem_time_breaking_ties(struct process* head)   
 {
     struct process* temp = head;

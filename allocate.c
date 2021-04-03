@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
         //Simplify array first to hold all the processes that are there
         // cpu_array[i].processes = (struct process**)malloc(proc_rem * sizeof(struct process*));
 
-        for (int j=0; j<4; j++){
+        for (int j=0; j<PROCESSES_ARR_LENGTH; j++){
             (cpu_array[i].processes)[j] = NULL; 
         }
 
@@ -111,6 +111,7 @@ int main(int argc, char* argv[]) {
 
         // cpu_array[i].cpu_rem_exec_time = calc_remaining_cpu_exec_time(cpu_array[i].cpu_id, &cpu_array);
         cpu_array[i].cpu_rem_exec_time = 0;
+        cpu_array[i].running_process_ptr = NULL;
 
     }  
 
@@ -136,7 +137,11 @@ int main(int argc, char* argv[]) {
                         run = get_process_with_smallest_rem_time_accounting_for_duplicates(head, current_time);
                         add_process_to_cpu(run, &cpu_array);
                         //RUN A FOR LOOP HERE TO THROUGH ALL THE CPUS, GET THEIR RUN POINTERS ANDTHEN PRINT
-                        printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id);
+                        // for (int i=0; i<CPU_ARR_LENGTH; i++){
+                        //     printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
+                        // }
+                        // printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id);
+                        printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[0].running_process_ptr->pid, cpu_array[0].running_process_ptr->rem_exec_time, cpu_array[0].cpu_id);
                     }
                     else {
                         // DO NOTHING, i.e. keep runnig the process that is already running
@@ -145,7 +150,8 @@ int main(int argc, char* argv[]) {
                 else{  // This indicate run = NULL and implies no process is running yet
                     run = get_process_with_smallest_rem_time_accounting_for_duplicates(head, current_time);
                     add_process_to_cpu(run, &cpu_array);
-                    printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id);
+                    // printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id);
+                    printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[0].running_process_ptr->pid, cpu_array[0].running_process_ptr->rem_exec_time, cpu_array[0].cpu_id);
                 }
                 /*******************************************************************************/
 
@@ -164,7 +170,8 @@ int main(int argc, char* argv[]) {
                     if (get_pointer_to_process_equal_to_curr_time(head, current_time)->rem_exec_time < run->rem_exec_time){
                         run = get_pointer_to_process_equal_to_curr_time(head, current_time);
                         add_process_to_cpu(run, &cpu_array); // Add pointer to the process to the relevant cpu
-                        printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id);
+                        // printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id);
+                        printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[0].running_process_ptr->pid, cpu_array[0].running_process_ptr->rem_exec_time, cpu_array[0].cpu_id);
                         // printf("CPU = %d , CPU_REM_EXEC_TIME = %d\n", run->cpu_ptr->cpu_id, run->cpu_ptr->cpu_rem_exec_time);
                     }
                     else {
@@ -174,7 +181,8 @@ int main(int argc, char* argv[]) {
                 else {
                     run = get_pointer_to_process_equal_to_curr_time(head, current_time); //Else, run this process as it is the first process
                     add_process_to_cpu(run, &cpu_array); // Add pointer to the process to the relevant cpu
-                    printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id); 
+                    // printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id); 
+                    printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[0].running_process_ptr->pid, cpu_array[0].running_process_ptr->rem_exec_time, cpu_array[0].cpu_id);
                 }
             }
             // Else do nothing, i.e. keep run pointer to previous process            
@@ -184,8 +192,8 @@ int main(int argc, char* argv[]) {
 /************************************************* DECREMENT SECTION **********************************************************/
 
         // If there is no process for which the current time is equal to its arr_time, then below code will run
-        (run->rem_exec_time)--; //To decrement the running process's execution time
-        (run->cpu_ptr->cpu_rem_exec_time)--; //To decrement the CPU's remaining execution time that is allocated to the running process
+        (cpu_array[0].running_process_ptr->rem_exec_time)--; //To decrement the running process's execution time
+        (cpu_array[0].cpu_rem_exec_time)--; //To decrement the CPU's remaining execution time that is allocated to the running process
         current_time++;
         // printf("\n%d\n", run->rem_exec_time);
 
@@ -197,7 +205,8 @@ int main(int argc, char* argv[]) {
         // Checks if the running process has finished executing
         if ((run->rem_exec_time == 0)){
             proc_rem--;
-            printf("%d,FINISHED,pid=%d,proc_remaining=%d\n", current_time, run->pid, proc_rem);
+            // printf("%d,FINISHED,pid=%d,proc_remaining=%d\n", current_time, run->pid, proc_rem);
+            printf("%d,FINISHED,pid=%d,proc_remaining=%d\n", current_time, cpu_array[0].running_process_ptr->pid, proc_rem);
             //run->cpu_ptr = NULL; //Need to remove from CPU after process have finished
             // printf("CPU = %d , CPU_REM_EXEC_TIME = %d\n", run->cpu_ptr->cpu_id, run->cpu_ptr->cpu_rem_exec_time);
 
@@ -221,7 +230,8 @@ int main(int argc, char* argv[]) {
             }
 
             if (run->rem_exec_time != 0){ // If run pointer process is not FINISHED yet, then print the link below
-                printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id);
+                // printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, run->pid, run->rem_exec_time, run->cpu_ptr->cpu_id);
+                printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[0].running_process_ptr->pid, cpu_array[0].running_process_ptr->rem_exec_time, cpu_array[0].cpu_id);
                 // printf("CPU = %d , CPU_REM_EXEC_TIME = %d\n", run->cpu_ptr->cpu_id, run->cpu_ptr->cpu_rem_exec_time);
             }
 
@@ -235,6 +245,17 @@ int main(int argc, char* argv[]) {
 
     }  // MAIN LOOP ENDS
 
+    /************** Checking the processes inside each CPU ***********/
+
+    // for (int i=0; i<CPU_ARR_LENGTH; i++){
+    //     for (int j=0; j<PROCESSES_ARR_LENGTH; j++){
+    //             if (cpu_array[i].processes[j] != NULL){
+    //                 printf(" %d ", cpu_array[0].processes[j]->pid);
+    //             }
+    //     }
+    //     printf("\n");
+    // }
+    /****************************************************************/
     
     fclose(fptr);
 
