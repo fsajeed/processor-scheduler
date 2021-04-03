@@ -3,7 +3,7 @@
 #include <limits.h>
 #include <stdbool.h>
 
-#define CPU_ARR_LENGTH 1
+#define CPU_ARR_LENGTH 2
 
 struct process {
     int arr_time;               // make unsigned long int
@@ -21,16 +21,8 @@ struct cpu {
     int cpu_id;
     struct process* processes[4]; // NEED to be an array of pointer to processes
     int cpu_rem_exec_time;
-    // IDEA OF HAVING A RUN POINTER
+    struct process* running_process_ptr; // Pointer to the process that the CPU is currently running
 };
-
-void printList(struct process* p)
-{
-    while (p != NULL) {
-        printf("\n%d\n", p->arr_time);
-        p = p->next;
-    }
-}
 
 
 //SHOULD ADD THE PROCESS TO THE CPU
@@ -177,33 +169,6 @@ bool has_same_arrival_times(struct process* head)
     return false;
 }
 
-
-// Function that returns smallest element
-// from the linked list.
-struct process* smallestArrivalTime(struct process* head)       // NEED TO SORT OUT TIES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-{
-    struct process* temp = head;
-    struct process* min_ptr;
-    // Declare a min variable and initialize
-    // it with UINT_MAX value.
-    // UINT_MAX is integer type and its value
-    // is 32767 or greater.
-    int min = INT_MAX;
-  
-    // Check loop while head not equal to NULL
-    while (temp != NULL) {
-        // If min is greater than temp->arr_time then
-        // assign value of temp->arr_time to min
-        // otherwise node point to next node.
-        if (min > (temp->arr_time)) {
-            min = temp->arr_time;
-            min_ptr = temp;
-        }
-        temp = temp->next;
-    }
-    return min_ptr;
-}
-
 bool search(struct process* head, int x)
 {
     struct process* current = head;  // Initialize current
@@ -281,7 +246,39 @@ struct process* get_shortest_rem_exec_time_process(struct process* head)
     }
 }
 
+// Function that returns smallest element
+// from the linked list.
+struct process* smallestArrivalTime(struct process* head)       // NEED TO SORT OUT TIES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+{
+    struct process* temp = head;
+    struct process* min_ptr;
+    // Declare a min variable and initialize
+    // it with UINT_MAX value.
+    // UINT_MAX is integer type and its value
+    // is 32767 or greater.
+    int min = INT_MAX;
+  
+    // Check loop while head not equal to NULL
+    while (temp != NULL) {
+        // If min is greater than temp->arr_time then
+        // assign value of temp->arr_time to min
+        // otherwise node point to next node.
+        if (min > (temp->arr_time)) {
+            min = temp->arr_time;
+            min_ptr = temp;
+        }
+        temp = temp->next;
+    }
+    return min_ptr;
+}
 
+void printList(struct process* p)
+{
+    while (p != NULL) {
+        printf("\n%d\n", p->arr_time);
+        p = p->next;
+    }
+}
 
     // struct process* find_lowest_arr_time(struct process* head_ptr) {
 
