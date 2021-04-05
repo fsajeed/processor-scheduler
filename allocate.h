@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #define CPU_ARR_LENGTH 1
-#define PROCESSES_ARR_LENGTH 10
+// #define PROCESSES_ARR_LENGTH 10
 
 struct process {
     int arr_time;               // make unsigned long int
@@ -20,10 +20,46 @@ struct process {
 
 struct cpu {
     int cpu_id;
-    struct process* processes[PROCESSES_ARR_LENGTH]; // NEED to be an array of pointer to processes
+    // struct process* processes[PROCESSES_ARR_LENGTH]; // NEED to be an array of pointer to processes
+    struct process_address_container* process_address_container_head;
     int cpu_rem_exec_time;
     struct process* running_process_ptr; // Pointer to the process that the CPU is currently running
 };
+
+// The struct used for constructing the Linked List in the CPU struct
+struct process_address_container {
+    struct process* process_ptr;
+    struct process_address_container* next;
+};
+
+void set_cpu_running_process_ptr(struct cpu* cpu_ptr)
+{
+    struct process_address_container* temp =  cpu_ptr->process_address_container_head;
+    struct process* min_ptr;
+
+    int min = INT_MAX;
+    // Check loop while head not equal to NULL
+    while (temp != NULL) {
+        if (temp->process_ptr->rem_exec_time != 0) { // SKIP THE PROCESS THAT HAS FINISHED
+            if (min > (temp->process_ptr->rem_exec_time)){
+                min = temp->process_ptr->rem_exec_time;
+                min_ptr = temp->process_ptr;
+            }
+            //BREAK TIE USING PID WHEN min value is same as the current process's rem_exec_time
+            else if (min == temp->process_ptr->rem_exec_time){
+                if(min_ptr->pid > temp->process_ptr->pid) {
+                    min_ptr = temp->process_ptr;
+                }
+                else {
+                    // DO NOTHING - min_ptr will not be changed as it already has the lowest pid among the two
+                }
+            }
+        }
+        temp = temp->next;
+    }
+    // return min_ptr;
+    cpu_ptr->running_process_ptr = min_ptr;
+}
 
 
 // SHOULD ADD THE PROCESS TO THE CPU
@@ -39,8 +75,6 @@ void add_process_to_cpu(struct process* process, struct cpu **cpu_array){
     struct cpu* min_ptr;
 
     for (int i=0; i<cpu_arr_length; i++){
-
-        // cpu_time = calc_remaining_cpu_exec_time((*cpu_array)[i].cpu_id, cpu_array);
 
         if ((*cpu_array)[i].cpu_rem_exec_time < min){
             min = (*cpu_array)[i].cpu_rem_exec_time;
@@ -66,14 +100,31 @@ void add_process_to_cpu(struct process* process, struct cpu **cpu_array){
     min_ptr->cpu_rem_exec_time = (min_ptr->cpu_rem_exec_time) + (process->rem_exec_time); //Updating the allocated cpu's remaining execution time
 
 
-    for (int j=0; j<PROCESSES_ARR_LENGTH; j++){
-        if ((min_ptr->processes)[j] == NULL){
-            (min_ptr->processes)[j] = process; // Add the process to the cpu processes list
-            break;
-        }
-    }
+    // for (int j=0; j<PROCESSES_ARR_LENGTH; j++){
+    //     if ((min_ptr->processes)[j] == NULL){
+    //         (min_ptr->processes)[j] = process; // Add the process to the cpu processes list
+    //         break;
+    //     }
+    // }
 
-    min_ptr->running_process_ptr = process;
+    struct process_address_container* new_node = (struct process_address_container*)malloc(sizeof(struct process_address_container));
+    struct process_address_container* temp;
+
+    new_node->process_ptr = process; // Add the process to the cpu processes list
+    new_node->next = NULL;
+
+    
+    if (min_ptr->process_address_container_head == NULL){        // For the first address  ontainer to be inserted into the Linked List
+        min_ptr->process_address_container_head = new_node; 
+    }
+    else {
+        temp = min_ptr->process_address_container_head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = new_node;
+    }
+    // min_ptr->running_process_ptr = process;
 
     process->cpu_ptr = min_ptr;     //Add the cpu pointer to the process
     
