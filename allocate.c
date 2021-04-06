@@ -120,15 +120,17 @@ int main(int argc, char* argv[]) {
     /*******************************************************************************/
 
 
-    struct process* run = NULL; // To point to the running process
+    // struct process* run = NULL; // To point to the running process
     // printf("%p\n",run);
     // struct process* run2; // For second processor
 
     /* Main Loop of The Program */
     while (proc_rem != 0){
 
-        print_CPU_process_list(cpu_array[0].process_address_container_head);
-        print_CPU_process_list(cpu_array[1].process_address_container_head);
+        // printf("%d ", current_time);
+        // print_CPU_process_list(cpu_array[0].process_address_container_head);
+        // printf("%d ", current_time);
+        // print_CPU_process_list(cpu_array[1].process_address_container_head);
 
         // if (current_time == 120){
         //     break;
@@ -188,57 +190,42 @@ int main(int argc, char* argv[]) {
                 // } 
             }
             
-            // IF PROCESSES DON"T HAVE SAME ARRIVAL TIMES
+            // IF PROCESSES DON'T HAVE SAME ARRIVAL TIMES
             else {
+
+                add_process_to_cpu(get_pointer_to_process_equal_to_curr_time(head, current_time), &cpu_array);
+
                 for (int i=0; i<CPU_ARR_LENGTH; i++){ // For loop for multiple CPUs
                 
+                    
                     // If a process is already running in that CPU
                     if (cpu_array[i].running_process_ptr != NULL) {  
-                        if (get_pointer_to_process_equal_to_curr_time(head, current_time)->rem_exec_time < cpu_array[i].running_process_ptr->rem_exec_time){
-                            // NEED TO STOP CALLING IT "RUN"
-                            run = get_pointer_to_process_equal_to_curr_time(head, current_time);
-                            if (run->cpu_ptr == NULL){
-                                add_process_to_cpu(run, &cpu_array); // Add pointer to the process to the relevant cpu
-                                // NEED A FUNCTION HERE TO SELECT THE PROCESS WITH THE LEAST REM TIME IN THE CPU'S PROCESSES LIST AS THE RUNNING_PROCESS_PTR
-                                set_cpu_running_process_ptr(&(cpu_array[i]));
-                                printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
-                            }
+                        // Check if the currently running process in the CPU is the same as the newly assigned process in the CPU 
+                        if (cpu_array[i].running_process_ptr == set_cpu_running_process_ptr(&(cpu_array[i]))){
+                            //If it is the same process being run, then no need to print it out
                         }
-                        else if (get_pointer_to_process_equal_to_curr_time(head, current_time)->rem_exec_time == cpu_array[i].running_process_ptr->rem_exec_time) {
-                            if (get_pointer_to_process_equal_to_curr_time(head, current_time)->pid < cpu_array[i].running_process_ptr->pid){
-                                run = get_pointer_to_process_equal_to_curr_time(head, current_time);
-                            }
-                            if (run->cpu_ptr == NULL){
-                                add_process_to_cpu(run, &cpu_array); // Add pointer to the process to the relevant cpu
-                                // NEED A FUNCTION HERE TO SELECT THE PROCESS WITH THE LEAST REM TIME IN THE CPU'S PROCESSES LIST AS THE RUNNING_PROCESS_PTR
-                                set_cpu_running_process_ptr(&(cpu_array[i]));
-                                printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
-                            }
-                        }
-                        else{
-                            // DO NOTHING, i.e. keep runnig the process that is already running
+                        else {
+                            printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
+
                         }
                     }
                     
                     // Else if no process is running in that CPU
                     else {
-                        run = get_pointer_to_process_equal_to_curr_time(head, current_time); //Else, run this process as it is the first process
+                        // run = get_pointer_to_process_equal_to_curr_time(head, current_time); //Else, run this process as it is the first process
                         //Check if the process is already allocated to a CPU
-                        if (run->cpu_ptr == NULL){
-                            add_process_to_cpu(run, &cpu_array); // Add pointer to the process to the relevant cpu
+                        // if (run->cpu_ptr == NULL){
                             // NEED A FUNCTION HERE TO SELECT THE PROCESS WITH THE LEAST REM TIME IN THE CPU'S PROCESSES LIST AS THE RUNNING_PROCESS_PTR
                             set_cpu_running_process_ptr(&(cpu_array[i]));
-                            printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
-                        }
+                            if (cpu_array[i].running_process_ptr != NULL){
+                                printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
+                            }
+                        // }
                         
                     }
                 } // END OF FOR LOOP
             }          
         }
-        // if (current_time == 20){
-        //     print_CPU_process_list(cpu_array[1].process_address_container_head);
-        // }
-
 /************************************************* DECREMENT SECTION **********************************************************/
 
         // If there is no process for which the current time is equal to its arr_time, then below code will run
@@ -287,7 +274,7 @@ int main(int argc, char* argv[]) {
                     // IF there is a tie between rem times, then break tie using pid
 
                     // run = get_process_with_smallest_rem_time_breaking_ties(head);
-                    // printf("\n %d \n", run->pid);
+                    // // printf("\n %d \n", run->pid);
                     // if (run->cpu_ptr == NULL){
                     //     add_process_to_cpu(run, &cpu_array); // Add pointer to the process to the relevant cpu
                     //     // NEED A FUNCTION HERE TO SELECT THE PROCESS WITH THE LEAST REM TIME IN THE CPU'S PROCESSES LIST AS THE RUNNING_PROCESS_PTR

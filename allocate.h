@@ -3,7 +3,7 @@
 #include <limits.h>
 #include <stdbool.h>
 
-#define CPU_ARR_LENGTH 2
+#define CPU_ARR_LENGTH 1
 // #define PROCESSES_ARR_LENGTH 10
 
 struct process {
@@ -32,7 +32,7 @@ struct process_address_container {
     struct process_address_container* next;
 };
 
-void set_cpu_running_process_ptr(struct cpu* cpu_ptr)
+struct process* set_cpu_running_process_ptr(struct cpu* cpu_ptr)
 {
     struct process_address_container* temp =  cpu_ptr->process_address_container_head;
     struct process* min_ptr = NULL;
@@ -59,6 +59,8 @@ void set_cpu_running_process_ptr(struct cpu* cpu_ptr)
     }
     // return min_ptr;
     cpu_ptr->running_process_ptr = min_ptr;
+
+    return min_ptr;
 }
 
 
