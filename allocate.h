@@ -3,7 +3,7 @@
 #include <limits.h>
 #include <stdbool.h>
 
-#define CPU_ARR_LENGTH 1
+#define CPU_ARR_LENGTH 2
 // #define PROCESSES_ARR_LENGTH 10
 
 struct process {
@@ -35,12 +35,12 @@ struct process_address_container {
 void set_cpu_running_process_ptr(struct cpu* cpu_ptr)
 {
     struct process_address_container* temp =  cpu_ptr->process_address_container_head;
-    struct process* min_ptr;
+    struct process* min_ptr = NULL;
 
     int min = INT_MAX;
     // Check loop while head not equal to NULL
     while (temp != NULL) {
-        if (temp->process_ptr->rem_exec_time != 0) { // SKIP THE PROCESS THAT HAS FINISHED
+        if (temp->process_ptr->rem_exec_time != 0 ) { // SKIP THE PROCESS THAT HAS FINISHED
             if (min > (temp->process_ptr->rem_exec_time)){
                 min = temp->process_ptr->rem_exec_time;
                 min_ptr = temp->process_ptr;
@@ -171,7 +171,7 @@ struct process* get_process_with_smallest_rem_time_accounting_for_duplicates(str
 struct process* get_process_with_smallest_rem_time_breaking_ties(struct process* head)   
 {
     struct process* temp = head;
-    struct process* min_ptr;
+    struct process* min_ptr = NULL;
     // Declare a min variable and initialize
     // it with UINT_MAX value.
     // UINT_MAX is integer type and its value
@@ -180,7 +180,8 @@ struct process* get_process_with_smallest_rem_time_breaking_ties(struct process*
   
     // Check loop while head not equal to NULL
     while (temp != NULL) {
-        if (temp->rem_exec_time != 0) { // SKIP THE PROCESS THAT HAS FINISHED
+        // SKIP THE PROCESS THAT HAS FINISHED
+        if (temp->rem_exec_time != 0) { 
             if (min > (temp->rem_exec_time)){
                 min = temp->rem_exec_time;
                 min_ptr = temp;
@@ -334,6 +335,15 @@ void printList(struct process* p)
         printf("\n%d\n", p->arr_time);
         p = p->next;
     }
+}
+
+void print_CPU_process_list(struct process_address_container* p)
+{
+    while (p != NULL) {
+        printf(" %d ", p->process_ptr->pid);
+        p = p->next;
+    }
+    printf("\n");
 }
 
     // struct process* find_lowest_arr_time(struct process* head_ptr) {
