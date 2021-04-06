@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
     // Reads text until newline is encountered
     while (EOF != fscanf(fptr, "%[^\n]\n", line)) {
         insert_process(&head, line);
-        proc_rem++;
+        // proc_rem++;
     }
 
     /*****************************************************************************/
@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
 
 
     /* Main Loop of The Program */
-    while (proc_rem != 0){
+    while (!is_all_process_completed(head)){
 
         // printf("%d ", current_time);
         // print_CPU_process_list(cpu_array[0].process_address_container_head);
@@ -156,7 +156,7 @@ int main(int argc, char* argv[]) {
                         }
                         else {
                             printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
-
+                            proc_rem++;
                         }
                     }
                     
@@ -165,6 +165,7 @@ int main(int argc, char* argv[]) {
                             set_cpu_running_process_ptr(&(cpu_array[i]));
                             if (cpu_array[i].running_process_ptr != NULL){
                                 printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
+                                proc_rem++;
                             }
                         // }
                         
@@ -212,6 +213,7 @@ int main(int argc, char* argv[]) {
                     set_cpu_running_process_ptr(&(cpu_array[i]));
                     if( cpu_array[i].running_process_ptr != NULL){
                         printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
+                        // proc_rem++;
                     } 
                     else {
                         break;
