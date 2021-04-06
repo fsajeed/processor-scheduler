@@ -3,9 +3,6 @@
 #include <limits.h>
 #include <stdbool.h>
 
-#define CPU_ARR_LENGTH 2
-// #define PROCESSES_ARR_LENGTH 10
-
 struct process {
     int arr_time;               // make unsigned long int
     int pid;                    // make unsigned long int
@@ -31,6 +28,7 @@ struct process_address_container {
     struct process* process_ptr;
     struct process_address_container* next;
 };
+
 
 struct process* set_cpu_running_process_ptr(struct cpu* cpu_ptr)
 {
@@ -66,17 +64,16 @@ struct process* set_cpu_running_process_ptr(struct cpu* cpu_ptr)
 
 // SHOULD ADD THE PROCESS TO THE CPU
 // AND ALSO, ADD THE CPU TO THE PROCESS
-void add_process_to_cpu(struct process* process, struct cpu **cpu_array){
+void add_process_to_cpu(struct process* process, int num_cpus, struct cpu **cpu_array){
     // Check which CPU's remaining execution time is lowest, and assign to that CPU
     // If tie between remainig times, then check CPU ids of tied ones
     // Assign to the one with smallest cpu_id
-
-    int cpu_arr_length = CPU_ARR_LENGTH; // it can also be argv[x]
+    
     int min = INT_MAX;
     // int cpu_time;
     struct cpu* min_ptr = NULL;
 
-    for (int i=0; i<cpu_arr_length; i++){
+    for (int i=0; i<num_cpus; i++){
 
         if ((*cpu_array)[i].cpu_rem_exec_time < min){
             min = (*cpu_array)[i].cpu_rem_exec_time;
@@ -133,11 +130,25 @@ void add_process_to_cpu(struct process* process, struct cpu **cpu_array){
     return;
 }
 
+void add_all_processes_arriving_at_same_time(struct process* head, int num_cpus, struct cpu **cpu_array, int current_time){
+
+    struct process* curr = head;
+    while (curr != NULL){
+        if (curr->arr_time == current_time){
+            add_process_to_cpu(curr, num_cpus, cpu_array);
+            curr = curr->next;
+        }
+        else{
+            curr = curr->next;
+        }
+    }
+}
+
 // Returns pointer to process with the smallest remaiing execution time, after breaking ties with pid
 struct process* get_process_with_smallest_rem_time_accounting_for_duplicates(struct process* head, int current_time)   
 {
     struct process* temp = head;
-    struct process* min_ptr;
+    struct process* min_ptr = NULL;
     // Declare a min variable and initialize
     // it with UINT_MAX value.
     // UINT_MAX is integer type and its value
