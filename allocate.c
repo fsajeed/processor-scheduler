@@ -130,24 +130,27 @@ int main(int argc, char* argv[]) {
 
                 // While all the process 'at this current time' does not have a cpu_id, insert process into CPU process list
                 // Insert all the processes arriving at the same time to relevant CPUs
-                // curr = head;
-                // while (curr != NULL){
-                //     if (curr->arr_time == current_time){
                 
                 if (has_same_arrival_times(head)){
-                    add_all_processes_arriving_at_same_time(head, num_cpus, &cpu_array, current_time);
+                    struct process* curr = head;
+                    while (curr != NULL){
+                        if (curr->arr_time == current_time){
+                            add_process_to_cpu(curr, num_cpus, &cpu_array);
+                            proc_rem++;
+                            curr = curr->next;
+                        }
+                        else{
+                            curr = curr->next;
+                        }
+                    }
                 }
                 else {
                     add_process_to_cpu(get_pointer_to_process_equal_to_curr_time(head, current_time), num_cpus, &cpu_array);
+                    proc_rem++;
                 }
-                //         curr = curr->next;
-                //     }
-                //     curr = curr->next;
-                // }
 
                 for (int i=0; i<num_cpus; i++){ // For loop for multiple CPUs
-                
-                    
+
                     // If a process is already running in that CPU
                     if (cpu_array[i].running_process_ptr != NULL) {  
                         // Check if the currently running process in the CPU is the same as the newly assigned process in the CPU 
@@ -156,7 +159,7 @@ int main(int argc, char* argv[]) {
                         }
                         else {
                             printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
-                            proc_rem++;
+
                         }
                     }
                     
@@ -165,7 +168,6 @@ int main(int argc, char* argv[]) {
                             set_cpu_running_process_ptr(&(cpu_array[i]));
                             if (cpu_array[i].running_process_ptr != NULL){
                                 printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
-                                proc_rem++;
                             }
                         // }
                         
@@ -213,7 +215,6 @@ int main(int argc, char* argv[]) {
                     set_cpu_running_process_ptr(&(cpu_array[i]));
                     if( cpu_array[i].running_process_ptr != NULL){
                         printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
-                        // proc_rem++;
                     } 
                     else {
                         break;
