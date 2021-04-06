@@ -3,7 +3,7 @@
 #include <limits.h>
 #include <stdbool.h>
 
-#define CPU_ARR_LENGTH 1
+#define CPU_ARR_LENGTH 2
 // #define PROCESSES_ARR_LENGTH 10
 
 struct process {
@@ -74,7 +74,7 @@ void add_process_to_cpu(struct process* process, struct cpu **cpu_array){
     int cpu_arr_length = CPU_ARR_LENGTH; // it can also be argv[x]
     int min = INT_MAX;
     // int cpu_time;
-    struct cpu* min_ptr;
+    struct cpu* min_ptr = NULL;
 
     for (int i=0; i<cpu_arr_length; i++){
 
@@ -203,7 +203,54 @@ struct process* get_process_with_smallest_rem_time_breaking_ties(struct process*
     return min_ptr;
 }
 
+void insert_process(struct process** head_ptr, char* process_data) {
 
+   struct process* new_node = (struct process*)malloc(sizeof(struct process));
+   struct process* temp;
+   
+   // Extract the first token
+   char * token = strtok(process_data, " ");
+   int count = 0;
+   // loop through the string to extract all other tokens
+   while( token != NULL ) {
+    //   printf("%s\n", token); //printing each token
+
+    /* Inserting into struct */
+      if (count==0) {
+          new_node->arr_time = atoi(token);
+      }
+      else if (count==1){
+          new_node->pid = atoi(token);
+      }
+      else if (count==2){
+          new_node->exec_time = atoi(token);
+      }
+      else if (count==3){
+          new_node->parallelisability = token;
+      }  
+      
+    /****************************/
+      token = strtok(NULL, " ");
+      count++;
+   }
+
+   new_node->rem_exec_time = new_node->exec_time;
+   new_node->cpu_ptr = NULL;                           // cpu_id = -1 means no cpu is assigned to the process yet
+   new_node->next = NULL;
+
+
+   if (*head_ptr == NULL){
+       *head_ptr = new_node;
+       return; 
+   }
+
+   temp = *head_ptr;
+   while (temp->next != NULL) {
+       temp = temp->next;
+   }
+   temp->next = new_node;
+   return;
+}
 
 // Function to check if there are processes with same arrival times in the Linked List
 bool has_same_arrival_times(struct process* head)

@@ -2,56 +2,7 @@
 #include <stdlib.h> // For exit() function
 #include <string.h>
 #include <stdbool.h>
-#include "allocate.h"
-
-void insert_process(struct process** head_ptr, char* process_data) {
-
-   struct process* new_node = (struct process*)malloc(sizeof(struct process));
-   struct process* temp;
-   
-   // Extract the first token
-   char * token = strtok(process_data, " ");
-   int count = 0;
-   // loop through the string to extract all other tokens
-   while( token != NULL ) {
-    //   printf("%s\n", token); //printing each token
-
-    /* Inserting into struct */
-      if (count==0) {
-          new_node->arr_time = atoi(token);
-      }
-      else if (count==1){
-          new_node->pid = atoi(token);
-      }
-      else if (count==2){
-          new_node->exec_time = atoi(token);
-      }
-      else if (count==3){
-          new_node->parallelisability = token;
-      }  
-      
-    /****************************/
-      token = strtok(NULL, " ");
-      count++;
-   }
-
-   new_node->rem_exec_time = new_node->exec_time;
-   new_node->cpu_ptr = NULL;                           // cpu_id = -1 means no cpu is assigned to the process yet
-   new_node->next = NULL;
-
-
-   if (*head_ptr == NULL){
-       *head_ptr = new_node;
-       return; 
-   }
-
-   temp = *head_ptr;
-   while (temp->next != NULL) {
-       temp = temp->next;
-   }
-   temp->next = new_node;
-   return;
-}
+#include "functions.c"
 
 int main(int argc, char* argv[]) {
 
