@@ -10,13 +10,13 @@ int main(int argc, char* argv[]) {
 
     struct process* head = NULL;  // name of the pointer is head and not pointing to anything...  
 
-    int current_time=0;
+    unsigned long int current_time=0;
 
     char line[1000]; // use malloc later
 
-    int proc_rem = 0;
+    unsigned long int proc_rem = 0;
 
-    int process_count = 0;
+    unsigned long int process_count = 0;
 
     char* file_name;
 
@@ -161,7 +161,7 @@ int main(int argc, char* argv[]) {
                             //If it is the same process being run, then no need to print it out
                         }
                         else {
-                            printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
+                            printf("%lu,RUNNING,pid=%lu,remaining_time=%lu,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
 
                         }
                     }
@@ -170,7 +170,7 @@ int main(int argc, char* argv[]) {
                     else {
                             set_cpu_running_process_ptr(&(cpu_array[i]));
                             if (cpu_array[i].running_process_ptr != NULL){
-                                printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
+                                printf("%lu,RUNNING,pid=%lu,remaining_time=%lu,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
                             }
                         // }
                         
@@ -201,7 +201,7 @@ int main(int argc, char* argv[]) {
 
                 proc_rem--;
 
-                printf("%d,FINISHED,pid=%d,proc_remaining=%d\n", current_time, cpu_array[i].running_process_ptr->pid, proc_rem);
+                printf("%lu,FINISHED,pid=%lu,proc_remaining=%lu\n", current_time, cpu_array[i].running_process_ptr->pid, proc_rem);
                 cpu_array[i].running_process_ptr->completed_time = current_time;
 
                 // CHECK AGAIN HERE TO SET THE PROCESS WITH THE SHORTEST EXECUTION TIME
@@ -218,7 +218,7 @@ int main(int argc, char* argv[]) {
                     // If no, then don't print out anything of the current CPU, and move to the next CPU
                     set_cpu_running_process_ptr(&(cpu_array[i]));
                     if( cpu_array[i].running_process_ptr != NULL){
-                        printf("%d,RUNNING,pid=%d,remaining_time=%d,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
+                        printf("%lu,RUNNING,pid=%lu,remaining_time=%lu,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
                     } 
                     else {
                         break;
@@ -238,7 +238,7 @@ int main(int argc, char* argv[]) {
 
     printf("Turnaround time %d\n", calculate_turnaround_time(head, process_count));
     printf("Time overhead %.2f %.2f\n", calculate_max_time_overhead(head, process_count), calculate_avg_time_overhead(head, process_count));
-    printf("Makespan %d\n", current_time);
+    printf("Makespan %lu\n", current_time);
 
 
 /******************************************************************************************************************************/
