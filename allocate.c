@@ -15,6 +15,8 @@ int main(int argc, char* argv[]) {
 
     int proc_rem = 0;
 
+    int process_count = 0;
+
     char* file_name;
 
     int num_cpus;
@@ -41,7 +43,7 @@ int main(int argc, char* argv[]) {
     // Reads text until newline is encountered
     while (EOF != fscanf(fptr, "%[^\n]\n", line)) {
         insert_process(&head, line);
-        // proc_rem++;
+        process_count++;
     }
 
     /*****************************************************************************/
@@ -199,6 +201,7 @@ int main(int argc, char* argv[]) {
                 proc_rem--;
 
                 printf("%d,FINISHED,pid=%d,proc_remaining=%d\n", current_time, cpu_array[i].running_process_ptr->pid, proc_rem);
+                cpu_array[i].running_process_ptr->completed_time = current_time;
 
                 // CHECK AGAIN HERE TO SET THE PROCESS WITH THE SHORTEST EXECUTION TIME
                 //Traverse trough LL from head to find node with lowest rem_exec_time and set it to the run pointer
@@ -231,6 +234,11 @@ int main(int argc, char* argv[]) {
 /******************************************************************************************************************************/
 
     }  // MAIN LOOP ENDS
+
+    printf("Turnaround time %d\n", calculate_turnaround_time(head, process_count));
+    printf("Time overhead %.2f %.2f\n", calculate_max_time_overhead(head, process_count), calculate_avg_time_overhead(head, process_count));
+    printf("Makespan %d\n", current_time);
+
 
 /******************************************************************************************************************************/
     

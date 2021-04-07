@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <stdbool.h>
+#include <math.h>
 
 struct process {
     int arr_time;               // make unsigned long int
@@ -9,6 +10,7 @@ struct process {
     int exec_time;
     char *parallelisability;    // need to conver to just character later
     int rem_exec_time;
+    int completed_time;
     struct cpu *cpu_ptr;        // Should contain the reference/pointer to the CPU
     struct process *next;       // Pointer pointing to the next process stored in the Linked List
 
@@ -29,6 +31,41 @@ struct process_address_container {
     struct process_address_container* next;
 };
 
+int calculate_turnaround_time(struct process* head, int process_count){
+    double total = 0;
+    struct process* temp = head;
+    while(temp != NULL){
+        total += ((temp->completed_time) - (temp->arr_time));
+        temp = temp->next;
+    }
+    return (int)ceil(total/process_count);
+}
+
+double calculate_max_time_overhead(struct process* head, int process_count){
+    double max = INT_MIN;
+    double overhead;
+    struct process* temp = head;
+    while(temp != NULL){
+        overhead = (double)((temp->completed_time) - (temp->arr_time)) / temp->exec_time;
+        if (overhead > max){
+            max = overhead;
+        }
+        temp = temp->next;
+    }
+    return max;
+}
+
+double calculate_avg_time_overhead(struct process* head, int process_count){
+    double total_overhead = 0;
+    double avg;
+    struct process* temp = head;
+    while(temp != NULL){
+        total_overhead += (double)((temp->completed_time) - (temp->arr_time)) / temp->exec_time;
+        temp = temp->next;
+    }
+    avg = total_overhead/process_count;
+    return avg;
+}
 
 struct process* set_cpu_running_process_ptr(struct cpu* cpu_ptr)
 {
@@ -130,19 +167,6 @@ void add_process_to_cpu(struct process* process, int num_cpus, struct cpu **cpu_
     return;
 }
 
-void add_all_processes_arriving_at_same_time(struct process* head, int num_cpus, struct cpu **cpu_array, int current_time){
-
-    struct process* curr = head;
-    while (curr != NULL){
-        if (curr->arr_time == current_time){
-            add_process_to_cpu(curr, num_cpus, cpu_array);
-            curr = curr->next;
-        }
-        else{
-            curr = curr->next;
-        }
-    }
-}
 
 // Returns pointer to process with the smallest remaiing execution time, after breaking ties with pid
 struct process* get_process_with_smallest_rem_time_accounting_for_duplicates(struct process* head, int current_time)   
@@ -405,6 +429,22 @@ void print_CPU_process_list(struct process_address_container* p)
     }
     printf("\n");
 }
+
+
+// void add_all_processes_arriving_at_same_time(struct process* head, int num_cpus, struct cpu **cpu_array, int current_time){
+
+//     struct process* curr = head;
+//     while (curr != NULL){
+//         if (curr->arr_time == current_time){
+//             add_process_to_cpu(curr, num_cpus, cpu_array);
+//             curr = curr->next;
+//         }
+//         else{
+//             curr = curr->next;
+//         }
+//     }
+// }
+
 
     // struct process* find_lowest_arr_time(struct process* head_ptr) {
 
