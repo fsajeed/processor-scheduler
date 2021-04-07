@@ -33,12 +33,14 @@ struct process_address_container {
 
 int calculate_turnaround_time(struct process* head, int process_count){
     double total = 0;
+    double turnaround_time;
     struct process* temp = head;
     while(temp != NULL){
         total += ((temp->completed_time) - (temp->arr_time));
         temp = temp->next;
     }
-    return (int)ceil(total/process_count);
+    turnaround_time = ceil(total/process_count);
+    return (int)turnaround_time;
 }
 
 double calculate_max_time_overhead(struct process* head, int process_count){
