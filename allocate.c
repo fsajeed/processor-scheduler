@@ -5,7 +5,7 @@
 #include <math.h>
 #include "functions.c"
 
-#define MAX_FILE_LINE_LENGTH 50            // Assumption for maximum length of a line consisting of 2 unsigned long int data types (arrival time and remaining execution time), 1 float data type (process id) and one 1 character data type (parallelisability) along with some whitespaces.
+#define MAX_FILE_LINE_LENGTH 50            // Approximation for maximum length of a line consisting of 2 unsigned long int data types (arrival time and remaining execution time), 1 float data type (process id) and one 1 character data type (parallelisability) along with some whitespaces.
 
 
 
@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
 
     // Reads text until newline is encountered
     while (EOF != fscanf(fptr, "%[^\n]\n", line)) {
-        insert_process_into_linked_list(&head, line);
+        insert_process_data_into_linked_list(&head, line);
         // Increment process_count as each line from the file is inserted one by one
         process_count++;
     }

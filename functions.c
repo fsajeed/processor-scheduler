@@ -4,6 +4,7 @@
 #include <limits.h>
 #include <math.h>
 
+/*****************************************************************        Structs         **************************************************************************************/
 
 struct Process {
     unsigned long int arr_time;                 // 'unsigned long int' data type used to cover the arrival time range of [0,2^32).
@@ -24,20 +25,30 @@ struct Cpu {
     struct Process* running_process_ptr;        // Pointer to the process that the CPU is currently running.
 };
 
+/*********************************************************************************************************************************************************************************/
 
-void insert_process_into_linked_list(struct Process** head_ptr, char* process_data) {
+
+
+/*****************************************************************        Functions         **************************************************************************************/
+
+/*
+Function takes a reference (pointer to pointer) to the head of the
+main linked list that will contain all the processes, and a string 
+of process data. It processes the string data to store it in a newly 
+created node in the linked list. 
+*/
+void insert_process_data_into_linked_list(struct Process** head_ptr, char* process_data) {
 
    struct Process* new_node = (struct Process*)malloc(sizeof(struct Process));
    struct Process* temp;
    
-   // Extract the first token
+   // Extract first token
    char * token = strtok(process_data, " ");
    int count = 0;
-   // loop through the string to extract all other tokens
+   // Loop through the string to extract all other tokens
    while( token != NULL ) {
-    //   printf("%s\n", token); //printing each token
 
-    /* Inserting data from each line of file into Linked List nodes */
+    /* Inserting data from each line of file into Linked List as Nodes (Processes) */
       if (count == 0) {
           new_node->arr_time = atoi(token);
       }
@@ -49,14 +60,13 @@ void insert_process_into_linked_list(struct Process** head_ptr, char* process_da
       }
       else if (count == 3){
           new_node->parallelisability = *token;
-      }  
-      
-    /****************************/
+      }        
+    /********************************************************************************/
       token = strtok(NULL, " ");
       count++;
    }
 
-   new_node->rem_exec_time = new_node->exec_time;                          
+   new_node->rem_exec_time = new_node->exec_time;     // At first, 'remaining execution time' of a process is equal to the 'execution time'.                     
    new_node->next = NULL; 
    new_node->children_list_head = NULL;
    new_node->parent = NULL;
@@ -76,26 +86,30 @@ void insert_process_into_linked_list(struct Process** head_ptr, char* process_da
 }
 
 
-
+/*
+Function takes pointer to a CPU as parameter and returns the
+best process to run, i.e. checking for the process with lowest 
+remaining execution time, and breaking ties to run process with 
+the lowest process id when remaining times processes are the same. 
+Returns NULL if no process is in the process queue(linked list)
+of the CPU.
+*/
 struct Process* set_cpu_running_process_ptr(struct Cpu* cpu_ptr)
 {
     struct Process* temp =  cpu_ptr->processes_head;
     struct Process* min_ptr = NULL;
 
     unsigned long int min = ULONG_MAX;
-    // Check loop while head not equal to NULL
+
     while (temp != NULL) {
         if (min > (temp->rem_exec_time)){
             min = temp->rem_exec_time;
             min_ptr = temp;
         }
-        //BREAK TIE USING PID WHEN min value is same as the current process's rem_exec_time
+        //Break tie using pid when min value is same as the current process's rem_exec_time
         else if (min == temp->rem_exec_time){
             if(min_ptr->pid > temp->pid) {
                 min_ptr = temp;
-            }
-            else {
-                // DO NOTHING - min_ptr will not be changed as it already has the lowest pid among the two
             }
         }
     temp = temp->next;
@@ -107,40 +121,14 @@ struct Process* set_cpu_running_process_ptr(struct Cpu* cpu_ptr)
 }
 
 
-void remove_child_process_from_parent(struct Process** children_list_head_ref, float process_id)
-{
-    // Store head node
-    struct Process *temp = *children_list_head_ref, *prev;
- 
-    // If head node itself holds the process id to be deleted
-    if (temp != NULL && temp->pid == process_id) {
-        *children_list_head_ref = temp->next; // Changed head
-        free(temp); // free old head
-        return;
-    }
- 
-    // Search for the pid to be deleted, keep track of the
-    // previous node as 'prev->next' needs to be changed
-    while (temp != NULL && temp->pid != process_id) {
-        prev = temp;
-        temp = temp->next;
-    }
- 
-    // If pid was not present in linked list
-    if (temp == NULL){
-        return;
-    }
-
-    // Unlink the node from linked list
-    prev->next = temp->next;
- 
-    free(temp); // Free memory
-}
-
-
-/* Given a reference (pointer to pointer) to the head of the
-   main linked list and a process id, deletes the process node 
-   with the process id from the processes Linked List in a CPU */
+/* 
+Given a reference (pointer to pointer) to the head of the
+main linked list and a process id, deletes the process node 
+with the process id from the processes Linked List in a CPU 
+Attribution: This function was taken from 
+https://www.geeksforgeeks.org/linked-list-set-3-deleting-node/
+and modified.
+*/
 void remove_process_from_cpu(struct Process** head_ref, float process_id)
 {
     // Store head node
@@ -172,8 +160,55 @@ void remove_process_from_cpu(struct Process** head_ref, float process_id)
 }
 
 
-// SHOULD ADD THE PROCESS TO THE CPU
-// AND ALSO, ADD THE CPU TO THE PROCESS
+/* 
+Given a reference (pointer to pointer) to the head of the
+Parent process's linked list of child processes and a process id, deletes 
+the child process node with the process id from the Linked List. 
+Attribution: This function was taken from 
+https://www.geeksforgeeks.org/linked-list-set-3-deleting-node/
+and modified.
+*/
+void remove_child_process_from_parent(struct Process** children_list_head_ref, float process_id)
+{
+    // Store head node
+    struct Process *temp = *children_list_head_ref, *prev;
+ 
+    // If head node itself holds the process id to be deleted
+    if (temp != NULL && temp->pid == process_id) {
+        *children_list_head_ref = temp->next; // Changed head
+        free(temp); // free old head
+        return;
+    }
+ 
+    // Search for the pid to be deleted, keep track of the
+    // previous node as 'prev->next' needs to be changed
+    while (temp != NULL && temp->pid != process_id) {
+        prev = temp;
+        temp = temp->next;
+    }
+ 
+    // If pid was not present in linked list
+    if (temp == NULL){
+        return;
+    }
+
+    // Unlink the node from linked list
+    prev->next = temp->next;
+ 
+    free(temp); // Free memory
+
+}
+
+
+/*
+Function takes a pointer to a process, number of CPUs and the cpu array as parameters.
+It finds the CPU with the lowest cpu remaining execution time to be allocated to the given process.
+If there are ties between cpu remaining execution times, it breaks ties by CPU ids.
+Once CPU is found, it updates the CPU's remaining execution time and adds the process to the linked list (or queue)
+of the CPU it is allocated to.
+If the process to be added is parallellisable, the required number of child process nodes are created, giving each an unique id,
+and added to the CPU linked list as well as to the parent process's child process linked list.
+*/
 void add_process_to_cpu(struct Process* process, int num_cpus, struct Cpu **cpu_array){
     // Check which CPU's remaining execution time is lowest, and assign to that CPU
     // If tie between remainig times, then check CPU ids of tied ones
@@ -183,17 +218,14 @@ void add_process_to_cpu(struct Process* process, int num_cpus, struct Cpu **cpu_
 
     struct Cpu* min_cpu_ptr = &((*cpu_array)[0]);
 
-    /*find a empty one and return (REMOVE THIS)*/ 
-
     for (int i=1; i<num_cpus; i++){
 
         if ((*cpu_array)[i].cpu_rem_exec_time < min){
             min = (*cpu_array)[i].cpu_rem_exec_time;
             min_cpu_ptr = &((*cpu_array)[i]); // Get the pointer to the CPU
         }
-        else if ((*cpu_array)[i].cpu_rem_exec_time == min){ // RESOLVE TIES WITH SAME CPU REMAINING EXECUTION TIME (This case will not happen until the value for the first CPU is calculated)
-            // CHECK POINTER OF PREVIOUS CPU i.e. using i-1
-            // CHECK FOR CPU WITH LOWEST CPU ID
+        // Resolve ties for same CPU remaining execution times
+        else if ((*cpu_array)[i].cpu_rem_exec_time == min){
             if ((*cpu_array)[i].cpu_id > min_cpu_ptr->cpu_id){
                 //Do Nothing - the min_cpu_ptr will be the previous min_cpu_ptr
             }
@@ -201,12 +233,7 @@ void add_process_to_cpu(struct Process* process, int num_cpus, struct Cpu **cpu_
                 min_cpu_ptr = &((*cpu_array)[i]);
             }
         }
-        else if ((*cpu_array)[i].cpu_rem_exec_time > min){
-            //Do Nothing - the min_cpu_ptr will be the previous min_cpu_ptr
-        }
-
     }
-
 
 
     if (process->parallelisability == 'p' && num_cpus > 1) {
@@ -216,16 +243,15 @@ void add_process_to_cpu(struct Process* process, int num_cpus, struct Cpu **cpu_
         }
     }
     else {
-        min_cpu_ptr->cpu_rem_exec_time += process->rem_exec_time; //Updating the allocated cpu's remaining execution time
+        //Updating the allocated cpu's remaining execution time
+        min_cpu_ptr->cpu_rem_exec_time += process->rem_exec_time; 
     }
 
 
 
 
     if (process->parallelisability == 'p' && num_cpus > 1) {
-        // Make as many nodes as there are CPUs
-        // Run a for loop to give all the child processes their cid, this should me made as an attribute inside process struct
-        // So that when setting processes to run from a cpu, it can be checked like, if (process is parallelisable), then check which child process to run
+        // Make as many nodes as there are CPUs for child processes
         for (int i=0; i<num_cpus; i++){
             struct Process* new_node = (struct Process*)malloc(sizeof(struct Process));
             struct Process* temp;
@@ -247,7 +273,7 @@ void add_process_to_cpu(struct Process* process, int num_cpus, struct Cpu **cpu_
             
 
             /* Adding to the CPU processes list */
-            if ((*cpu_array)[i].processes_head == NULL){        // For the first process to be inserted into the Linked List
+            if ((*cpu_array)[i].processes_head == NULL){
                 (*cpu_array)[i].processes_head = new_node; 
             }
             else {
@@ -259,20 +285,21 @@ void add_process_to_cpu(struct Process* process, int num_cpus, struct Cpu **cpu_
             }
             /***************************************/
 
+            // Another node created to be inserted into the parent process's children linked list
             struct Process* new_node2 = (struct Process*)malloc(sizeof(struct Process));
             
-            new_node2->arr_time = process->arr_time;                     // Add the process to the cpu processes list(DELETE)
+            new_node2->arr_time = process->arr_time;                    
             new_node2->pid = child_id;
             new_node2->children_list_head = process->children_list_head;
-            new_node2->parent = process;                                 //sprintf(result, "%lu", process->pid); // Maximum value of a child process id can be 1024
+            new_node2->parent = process;                                 
             new_node2->exec_time = ceil((double)process->rem_exec_time / (double)num_cpus) + 1;
             new_node2->parallelisability = process->parallelisability;
             new_node2->rem_exec_time = ceil((double)process->rem_exec_time / (double)num_cpus) + 1;
             new_node2->completed_time = process->completed_time;
             new_node2->next = NULL;
 
-            /* Adding to the Parent process's children processes list */
-            if (process->children_list_head == NULL){        // For the first process to be inserted into the Linked List
+            /* Adding to the Parent process's child processes linked list */
+            if (process->children_list_head == NULL){ 
                 process->children_list_head = new_node2; 
             }
             else {
@@ -287,12 +314,13 @@ void add_process_to_cpu(struct Process* process, int num_cpus, struct Cpu **cpu_
         }
     }
 
+    // If the process to be added is not parallelisable
     else {
 
         struct Process* new_node = (struct Process*)malloc(sizeof(struct Process));
         struct Process* temp;
 
-        new_node->arr_time = process->arr_time;                     // Add the process to the cpu processes list(DELETE)
+        new_node->arr_time = process->arr_time;                     
         new_node->pid = process->pid;
         new_node->exec_time = process->exec_time;
         new_node->parallelisability = process->parallelisability;
@@ -300,8 +328,8 @@ void add_process_to_cpu(struct Process* process, int num_cpus, struct Cpu **cpu_
         new_node->completed_time = process->completed_time;
         new_node->next = NULL;
 
-        
-        if (min_cpu_ptr->processes_head == NULL){        // For the first process to be inserted into the Linked List
+        // For the first process to be inserted into the Linked List.
+        if (min_cpu_ptr->processes_head == NULL){        
             min_cpu_ptr->processes_head = new_node; 
         }
         else {
@@ -312,80 +340,42 @@ void add_process_to_cpu(struct Process* process, int num_cpus, struct Cpu **cpu_
             temp->next = new_node;
         }
     }
-    
     return;
 }
 
 
-// Returns pointer to process with the smallest remaiing execution time, after breaking ties with pid
-struct Process* get_process_with_smallest_rem_time_accounting_for_duplicates(struct Process* head, int current_time)   
-{
-    struct Process* temp = head;
-    struct Process* min_ptr = NULL;
-    // Declare a min variable and initialize
-    // it with UINT_MAX value.
-    // UINT_MAX is integer type and its value
-    // is 32767 or greater.
-    unsigned long int min = ULONG_MAX;
-  
-    // Check loop while head not equal to NULL
-    while (temp != NULL) {
-        if (temp->rem_exec_time != 0) { // SKIP THE PROCESS THAT HAS FINISHED
-            if (temp->arr_time == current_time){   // SKIP THE PROCESS THAT DID NOT ARRIVE AT THE CURRENT TIME
-                if (min > (temp->rem_exec_time)){
-                    min = temp->rem_exec_time;
-                    min_ptr = temp;
-                }
-                //BREAK TIE USING PID WHEN min value is same as the current process's rem_exec_time
-                else if (min == temp->rem_exec_time){
-                    if(min_ptr->pid > temp->pid) {
-                        min_ptr = temp;
-                    }
-                    else {
-                        // DO NOTHING - min_ptr will not be changed as it already has the lowest pid among the two
-                    }
-                }
-            }
-        }
-        temp = temp->next;
-    }
-    return min_ptr;
-}
-
-
-
-
-
-
-// Function to check if there are processes with same arrival times in the Linked List
+/* 
+Function checks if there are processes with same arrival times in the Linked List.
+Returns true if there are, and false otherwise. 
+*/
 bool has_same_arrival_times(struct Process* head)
 {
     while (head->next != NULL) {
-  
         // Starting from the next node
         struct Process* ptr = head->next;
         while (ptr != NULL) {
-  
-            // If some duplicate node is found
+            // If some node with same arrival time is found
             if (head->arr_time == ptr->arr_time) {
                 return true;
-                // break;
             }
             ptr = ptr->next;
         }
-  
         head = head->next;
     }
-
     return false;
 }
 
-bool has_process_arrived_at_current_time(struct Process* head, unsigned long int x)
+/* 
+Function takes a time value and a linked list head pointer as parameters, 
+and returns true if any arrival time of processes matches with the given
+time value, returns false if no match is found. 
+*/
+bool has_process_arrived_at_current_time(struct Process* head, unsigned long int time)
 {
     struct Process* current = head;  // Initialize current
     while (current != NULL)
     {
-        if (current->arr_time == x){
+        if (current->arr_time == time){
             return true;
         }
         current = current->next;
@@ -393,6 +383,11 @@ bool has_process_arrived_at_current_time(struct Process* head, unsigned long int
     return false;
 }
 
+/* 
+Function takes a time value and a linked list head pointer as parameters, 
+and returns the pointer to the process who's arrival time matches with the given
+time value, returns NULL if no match is found. 
+*/
 struct Process* get_ptr_to_process_equal_to_curr_time(struct Process* head, unsigned long int time)
 {
     struct Process* current = head;  // Initialize current
@@ -407,6 +402,11 @@ struct Process* get_ptr_to_process_equal_to_curr_time(struct Process* head, unsi
     return current;
 }
 
+/* 
+Function takes process_id and a linked list head pointer as parameters, 
+and returns the pointer to the process if it is found in the linked list,
+otherwise returns NULL. 
+*/
 struct Process* get_ptr_to_process_equal_to_pid(struct Process* head, float process_id)
 {
     struct Process* current = head;  // Initialize current
@@ -422,34 +422,12 @@ struct Process* get_ptr_to_process_equal_to_pid(struct Process* head, float proc
 }
 
 
-void print_pids_in_list(struct Process* p)
-{
-    while (p != NULL) {
-        printf(" %d ", (int)p->pid);
-        p = p->next;
-    }
-}
-
-void print_CPU_process_list(struct Process* processes_head)
-{
-    struct Process* p = processes_head;
-    while (p != NULL) {
-        printf(" %.1f ", p->pid);
-        p = p->next;
-    }
-    // printf("\n");
-}
-
-void print_CPU_ids(struct Cpu* cpu_array, int num_cpus)
-{
-    for (int i=0; i<num_cpus; i++) {
-        printf(" %d ", cpu_array[i].cpu_id);
-    }
-}
 
 
-
-/* function to swap data of two nodes a and b*/
+/* 
+Function to swap data of two Process nodes a and b.
+Used when the sort_remaining_execution_times() function is called.
+*/
 void swap(struct Process *a, struct Process *b)
 {
     float temp1 = a->pid;
@@ -474,7 +452,12 @@ void swap(struct Process *a, struct Process *b)
 }
 
 
-/* Bubble sort the given linked list */
+/* 
+Bubble sort the given linked list 
+Attribution: This function was taken from 
+https://www.geeksforgeeks.org/c-program-bubble-sort-linked-list/
+and modified slightly.
+*/
 void sort_remaining_execution_times(struct Process *head)
 {
     int swapped;
@@ -541,3 +524,35 @@ double calculate_avg_time_overhead(struct Process* head, int process_count) {
     avg = total_overhead/process_count;
     return avg;
 }
+
+/**********************************************************************************************************************************************************************************************/
+
+
+
+/*************************   DEBUG FUNCTIONS   *****************************/
+void print_pids_in_list(struct Process* p)
+{
+    while (p != NULL) {
+        printf(" %d ", (int)p->pid);
+        p = p->next;
+    }
+}
+
+void print_CPU_process_list(struct Process* processes_head)
+{
+    struct Process* p = processes_head;
+    while (p != NULL) {
+        printf(" %.1f ", p->pid);
+        p = p->next;
+    }
+    // printf("\n");
+}
+
+void print_CPU_ids(struct Cpu* cpu_array, int num_cpus)
+{
+    for (int i=0; i<num_cpus; i++) {
+        printf(" %d ", cpu_array[i].cpu_id);
+    }
+}
+
+/*********************************************************************************/
