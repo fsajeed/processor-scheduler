@@ -600,6 +600,79 @@ void print_CPU_ids(struct cpu* cpu_array, int num_cpus)
 }
 
 
+
+// /* function to swap data of two nodes a and b*/
+// void swap(struct process **a, struct process **b)
+// {
+//     struct process **temp = a;
+//     *a = *b;
+//     b = temp;
+// }
+
+// /* Bubble sort the given linked list */
+// void sort_remaining_execution_times(struct process **head)
+// {
+//     int swapped;
+//     struct process *ptr1;
+//     struct process *lptr = NULL;
+  
+//     /* Checking for empty list */
+//     if (*head == NULL)
+//         return;
+  
+//     do
+//     {
+//         swapped = 0;
+//         ptr1 = *head;
+  
+//         while (ptr1->next != lptr)
+//         {
+//             if (ptr1->rem_exec_time > ptr1->next->rem_exec_time)
+//             { 
+//                 swap(ptr1, ptr1->next);
+//                 swapped = 1;
+//             }
+//             ptr1 = ptr1->next;
+//         }
+//         lptr = ptr1;
+//     }
+//     while (swapped);
+// }
+
+// /* Bubble sort the given linked list */
+// void sort_pids(struct process *head)
+// {
+//     int swapped;
+//     struct process *ptr1;
+//     struct process *lptr = NULL;
+  
+//     /* Checking for empty list */
+//     if (head == NULL)
+//         return;
+  
+//     do
+//     {
+//         swapped = 0;
+//         ptr1 = head;
+  
+//         while (ptr1->next != lptr)
+//         {
+//             if (ptr1->rem_exec_time > ptr1->next->rem_exec_time)
+//             { 
+//                 swap(ptr1, ptr1->next);
+//                 swapped = 1;
+//             }
+//             ptr1 = ptr1->next;
+//         }
+//         lptr = ptr1;
+//     }
+//     while (swapped);
+// }
+  
+
+
+
+
 // void add_all_processes_arriving_at_same_time(struct process* head, int num_cpus, struct cpu **cpu_array, int current_time){
 
 //     struct process* curr = head;

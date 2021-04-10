@@ -83,6 +83,7 @@ int main(int argc, char* argv[]) {
         if (has_process_arrived_at_current_time(head, current_time)) {
             // Insert all the processes arriving at the same time to relevant CPUs
             if (has_same_arrival_times(head)){
+                // sort_remaining_execution_times(&head);
                 struct process* curr = head;
                 while (curr != NULL){
                     if (curr->arr_time == current_time){
@@ -138,13 +139,13 @@ int main(int argc, char* argv[]) {
 
 
         // DEBUG CODE
-        for (int i=0; i<num_cpus; i++){
-            printf("\n%lu CPU%d: ", current_time, cpu_array[i].cpu_id);
-            print_CPU_process_list(cpu_array[i].processes_head);
-            if (cpu_array[i].running_process_ptr != NULL){
-            printf("\nRUNNING: %.1f\n", cpu_array[i].running_process_ptr->pid);
-            }
-        }
+        // for (int i=0; i<num_cpus; i++){
+        //     printf("\n%lu CPU%d: ", current_time, cpu_array[i].cpu_id);
+        //     print_CPU_process_list(cpu_array[i].processes_head);
+        //     if (cpu_array[i].running_process_ptr != NULL){
+        //     printf("\nRUNNING: %.1f\n", cpu_array[i].running_process_ptr->pid);
+        //     }
+        // }
 
          
 
