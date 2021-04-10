@@ -186,7 +186,7 @@ int main(int argc, char* argv[]) {
                         // Do the usual things like printing as done below
                         proc_rem--;
                         processes_remaining--;
-                        printf("%lu,FINISHED,pid=%d,proc_remaining=%lu\n", current_time, (int)cpu_array[i].running_process_ptr->pid, proc_rem);
+                        printf("%lu,FINISHED,pid=%d,proc_remaining=%lu\n", current_time, (int)cpu_array[i].running_process_ptr->parent->pid, proc_rem);
 
                         // Setting the Completed Time for a process when it has completed in the Main Linked List
                         get_ptr_to_process_equal_to_pid(head, cpu_array[i].running_process_ptr->parent->pid)->completed_time = current_time;
