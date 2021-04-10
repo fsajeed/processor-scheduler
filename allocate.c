@@ -4,27 +4,30 @@
 #include <stdbool.h>
 #include <math.h>
 #include "functions.c"
-#define MAX_FILE_LINE_LENGTH 50 // 3 unsigned long int data types (arrival time, process id and remaining execution time) and one 1 integer data type(CPU id) along with some whitespaces
+
+#define MAX_FILE_LINE_LENGTH 50            // Approximate assumption for maximum values of 2 unsigned long int data types (arrival time and remaining execution time), 1 float data type (process id) and one 1 character data type (parallelisability) along with some whitespaces
+
+
 
 int main(int argc, char* argv[]) {
 
-    struct process* head = NULL;  // The head pointer to the main Linked List where all the processes will be read in first
+    struct Process* head = NULL;           // The head pointer to the main Linked List where all the processes will be read in first
 
-    unsigned long int current_time=0;
+    unsigned long int current_time=0;      // Unsigned long int used due to the range [0, 2^32) of arrival times
 
-    char line[MAX_FILE_LINE_LENGTH]; 
+    char line[MAX_FILE_LINE_LENGTH];       // Will store each line representing an individual process's data from the file that is read in
 
     unsigned long int proc_rem = 0;
 
-    unsigned long int process_count = 0;
+    unsigned long int process_count = 0;    // Used for calculating statistics like Turnaround times and Time overheads
 
     char* file_name;
 
     int num_cpus;
 
-    /************************  Read In File  *********************************/
+/**************************************************************  Read In File  *************************************************************************/
 
-    // Checks command line arguments for specific flags to set the file and the number of CPUs. 
+    // Checks command line arguments for specific flags to set the file to be read and the number of CPUs. 
     for (int i=0; i<argc; i++){
         if (strcmp(argv[i], "-f") == 0) {
             file_name = argv[i + 1];
@@ -44,19 +47,21 @@ int main(int argc, char* argv[]) {
     // Reads text until newline is encountered
     while (EOF != fscanf(fptr, "%[^\n]\n", line)) {
         insert_process_into_linked_list(&head, line);
+        // Increment process_count as each line from the file is inserted one by one
         process_count++;
     }
 
+    /****************************************************************************************************************************************************/
+
+
+    // This extra variable with same value as process_count will be used to control and break the main execution loop later  
     unsigned long int processes_remaining = process_count;
 
-    /*****************************************************************************/
 
+    /***************************************************************   CPU Initialisation    ************************************************************/
 
-
-    /********************************    CPU Initialisation    *********************************/
-
-    struct cpu *cpu_array;
-    cpu_array = (struct cpu*)malloc(num_cpus * sizeof(struct cpu));
+    struct Cpu *cpu_array;
+    cpu_array = (struct Cpu*)malloc(num_cpus * sizeof(struct Cpu));
     for (int i=0; i<num_cpus; i++){
         cpu_array[i].cpu_id = i;
         cpu_array[i].processes_head = NULL;
@@ -64,30 +69,20 @@ int main(int argc, char* argv[]) {
         cpu_array[i].running_process_ptr = NULL;
     }  
 
-    /*******************************************************************************/
+    /******************************************************************************************************************************************************/
 
 
-    /* Main Loop of The Program */
-    while (processes_remaining){
+    /* Main Execution Loop of The Program */
+    while (processes_remaining) {
 
-        // DEBUG CODE
-        // printf("%lu ", current_time);
-        // print_CPU_process_list(cpu_array[0].processes_head);
-        // printf("%lu ", current_time);
-        // print_CPU_process_list(cpu_array[1].processes_head);
-        // printf("\nCurrent_time:%d , CPU-0-REM-TIME:%d , CPU-1-REM-TIME:%d\n", current_time, cpu_array[0].cpu_rem_exec_time, cpu_array[1].cpu_rem_exec_time );
-
-
-        
         /* Check if any process arrived at current time */
         if (has_process_arrived_at_current_time(head, current_time)) {
-            // Insert all the processes arriving at the same time to relevant CPUs
+            
             if (has_same_arrival_times(head)){
-                // print_pids_in_list(head);
+                // Sort the main linked list in increasing order of remaining execution times
                 sort_remaining_execution_times(head);
-                // printf("\nAfter Sorting\n");
-                // print_pids_in_list(head);
-                struct process* curr = head;
+                // Insert all the processes arriving at the same time to relevant CPUs
+                struct Process* curr = head;
                 while (curr != NULL){
                     if (curr->arr_time == current_time){
                         add_process_to_cpu(curr, num_cpus, &cpu_array);
@@ -99,6 +94,7 @@ int main(int argc, char* argv[]) {
                     }
                 }
             }
+            // If more than one process is not arriving at any given time, then add process to CPU one by one
             else {
                 add_process_to_cpu(get_ptr_to_process_equal_to_curr_time(head, current_time), num_cpus, &cpu_array);
                 proc_rem++;
@@ -109,12 +105,12 @@ int main(int argc, char* argv[]) {
 
                 // If a process is already running in that CPU
                 if (cpu_array[i].running_process_ptr != NULL) {  
-                    // Check if the currently running process in the CPU is the same as the newly assigned process in the CPU 
+                    // Check if the currently running process in the CPU is the same as the newly assigned running process in the CPU 
                     if (cpu_array[i].running_process_ptr == set_cpu_running_process_ptr(&(cpu_array[i]))){
                         //If it is the same process being run, then no need to print it out
                     }
                     else {
-                        // If the process running is a Child process
+                        // If the process running is a Child process (Parallelisability of a child process is 'p' because the parent process does not get added, rather copies of the parent gets added to the CPU as child processes except with different process ids)
                         if (cpu_array[i].running_process_ptr->parallelisability == 'p' && num_cpus > 1){
                             printf("%lu,RUNNING,pid=%.1f,remaining_time=%lu,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
                         }
@@ -124,7 +120,7 @@ int main(int argc, char* argv[]) {
                     }
                 }
                 
-                // Else if no process is running in that CPU
+                // If no process is running in that CPU, set a new process to run in that CPU
                 else {
                     set_cpu_running_process_ptr(&(cpu_array[i]));
                     if (cpu_array[i].running_process_ptr != NULL){
@@ -137,7 +133,7 @@ int main(int argc, char* argv[]) {
                         }
                     }    
                 }
-            } // END OF FOR LOOP         
+            }      
         }
 
 
@@ -152,30 +148,29 @@ int main(int argc, char* argv[]) {
 
          
 
-/************************************************* DECREMENT SECTION **********************************************************/
+/***************************************************************** DECREMENT SECTION ********************************************************************/
 
-        // If there is no more process for which the current time is equal to its arr_time, then below code will run
-        for (int i=0; i<num_cpus; i++){ // For loop for multiple CPUs
-            if (cpu_array[i].running_process_ptr != NULL) { // To check if there is any process allocated to the CPU or not
-                (cpu_array[i].running_process_ptr->rem_exec_time)--; //To decrement the running process's execution time
-                (cpu_array[i].cpu_rem_exec_time)--; //To decrement the CPU's remaining execution time that is allocated to the running process
+        // Loop to check for multiple CPUs
+        for (int i=0; i<num_cpus; i++){
+            // Check if there is any process running on the CPU 
+            if (cpu_array[i].running_process_ptr != NULL) { 
+                // Decrement the running process's execution time
+                (cpu_array[i].running_process_ptr->rem_exec_time)--; 
+                // Decrement the CPU's remaining execution time that is running the process
+                (cpu_array[i].cpu_rem_exec_time)--; 
             }        
         }
+
+/*********************************************************************************************************************************************************/
+
         current_time++;
 
-/******************************************************************************************************************************/
-
-
-
-/************************************************* CHECK IF PROCESS ENDED SECTION **********************************************************/
+/************************************************************** CHECK IF PROCESS ENDED SECTION ************************************************************/
 
         for (int i=0; i<num_cpus; i++) {
             
             // Checks if the running process has finished executing
             if ((cpu_array[i].running_process_ptr != NULL) && (cpu_array[i].running_process_ptr->rem_exec_time == 0)){
-
-                
-
 
                 // Check if the running process that has finished is a Child process or not
                 if (cpu_array[i].running_process_ptr->parallelisability == 'p' && num_cpus > 1){
@@ -221,23 +216,7 @@ int main(int argc, char* argv[]) {
                         }
                         
                     }
-                    
-
-                    // set_cpu_running_process_ptr(&(cpu_array[i]));
-                    // if( cpu_array[i].running_process_ptr != NULL){
-                    //     // If the process running is a Child process
-                    //     if (cpu_array[i].running_process_ptr->parallelisability == 'p' && num_cpus > 1){
-                    //         printf("%lu,RUNNING,pid=%.1f,remaining_time=%lu,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
-                    //     }
-                    //     else{
-                    //         printf("%lu,RUNNING,pid=%d,remaining_time=%lu,cpu=%d\n", current_time, (int)cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
-                    //     }
-                    // } 
-                    // else {
-                    //     break;
-                    // }
-
-                    
+ 
                     /***************************************************************************************************************************************************/
                     
                 }
@@ -262,10 +241,10 @@ int main(int argc, char* argv[]) {
                             remove_process_from_cpu(&cpu_array[j].processes_head, cpu_array[j].running_process_ptr->pid); // Removes the process from the CPU's processes linked list
                         }
                     }
-                    // CHECK AGAIN HERE TO SET THE PROCESS WITH THE SHORTEST EXECUTION TIME
-                    //Traverse trough LL from head to find node with lowest rem_exec_time and set it to the run pointer
-                    if (!processes_remaining){   /*If All process's rem_exec_time is equal to zero, i.e. if all processes are completed*/
-                        break;   // If all process is completed then BREAK out from the while loop
+                    
+                    // If all process is completed then BREAK out from the while loop
+                    if (!processes_remaining){  
+                        break;  
                     }
 
                     else{
@@ -283,26 +262,24 @@ int main(int argc, char* argv[]) {
                                     else{
                                         printf("%lu,RUNNING,pid=%d,remaining_time=%lu,cpu=%d\n", current_time, (int)cpu_array[j].running_process_ptr->pid, cpu_array[j].running_process_ptr->rem_exec_time, cpu_array[j].cpu_id);
                                     }
-                                } 
-                                // else {
-                                //     break;
-                                // }
+                                }
                             }
                         }
                     }
                 }
                 
             }
-        } // FOR LOOP ENDS
+        }
 
         // If all process is completed then BREAK out from the while loop (REDUNDANT)
         if(!processes_remaining) {
             break;                              
         }
-/******************************************************************************************************************************/
-
     }  // MAIN LOOP ENDS
 
+/******************************************************************************************************************************/
+
+    // Statistics Computation
     printf("Turnaround time %d\n", calculate_turnaround_time(head, process_count));
     printf("Time overhead %.2f %.2f\n", calculate_max_time_overhead(head, process_count), calculate_avg_time_overhead(head, process_count));
     printf("Makespan %lu\n", current_time);
