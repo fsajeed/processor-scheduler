@@ -171,11 +171,13 @@ void add_process_to_cpu(struct process* process, int num_cpus, struct cpu **cpu_
     // If tie between remainig times, then check CPU ids of tied ones
     // Assign to the one with smallest cpu_id
     
-    unsigned long int min = ULONG_MAX;
+    unsigned long int min = (*cpu_array)[0].cpu_rem_exec_time;
 
-    struct cpu* min_cpu_ptr = NULL;
+    struct cpu* min_cpu_ptr = &((*cpu_array)[0]);
 
-    for (int i=0; i<num_cpus; i++){
+    /*find a empty one and return (REMOVE THIS)*/ 
+
+    for (int i=1; i<num_cpus; i++){
 
         if ((*cpu_array)[i].cpu_rem_exec_time < min){
             min = (*cpu_array)[i].cpu_rem_exec_time;
@@ -184,16 +186,15 @@ void add_process_to_cpu(struct process* process, int num_cpus, struct cpu **cpu_
         else if ((*cpu_array)[i].cpu_rem_exec_time == min){ // RESOLVE TIES WITH SAME CPU REMAINING EXECUTION TIME (This case will not happen until the value for the first CPU is calculated)
             // CHECK POINTER OF PREVIOUS CPU i.e. using i-1
             // CHECK FOR CPU WITH LOWEST CPU ID
-            if ((*cpu_array)[i].cpu_id > (*cpu_array)[i-1].cpu_id){
-                //Put process in cpu with smaller cpu_id, i.e. i-1
-                min_cpu_ptr = &((*cpu_array)[i-1]);
+            if ((*cpu_array)[i].cpu_id > min_cpu_ptr->cpu_id){
+                //Do Nothing - the min_cpu_ptr will be the previous min_cpu_ptr
             }
             else {
                 min_cpu_ptr = &((*cpu_array)[i]);
             }
         }
         else if ((*cpu_array)[i].cpu_rem_exec_time > min){
-            // Do Nothing - because you do not add it to the cpu with higher cpu_time than the one with lower one
+            //Do Nothing - the min_cpu_ptr will be the previous min_cpu_ptr
         }
 
     }
@@ -276,7 +277,7 @@ void add_process_to_cpu(struct process* process, int num_cpus, struct cpu **cpu_
                 }
                 temp->next = new_node2;
             }
-            /***************************************/
+            /**********************************************************/
 
         }
     }
@@ -595,8 +596,12 @@ void print_CPU_process_list(struct process* processes_head)
     // printf("\n");
 }
 
-
-
+void print_CPU_ids(struct cpu* cpu_array, int num_cpus)
+{
+    for (int i=0; i<num_cpus; i++) {
+        printf(" %d ", cpu_array[i].cpu_id);
+    }
+}
 
 
 // void add_all_processes_arriving_at_same_time(struct process* head, int num_cpus, struct cpu **cpu_array, int current_time){
