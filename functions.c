@@ -7,7 +7,6 @@
 struct process {
     unsigned long int arr_time;               // 'unsigned long int' data type used to cover the arrival time range of [0,2^32)
     float pid;                    // 'unsigned long int' data type used to cover the process id range of [0,2^32)
-    float child_id;
     struct process* children_list_head;
     struct process* parent;
     unsigned long int exec_time;              // 'unsigned long int' data type used to cover the execution time range of [1,2^32)
@@ -222,15 +221,15 @@ void add_process_to_cpu(struct process* process, int num_cpus, struct cpu **cpu_
             struct process* new_node = (struct process*)malloc(sizeof(struct process));
             struct process* temp;
 
+            // Create the child process's id before inserting it into the new node as the process id
             char* cid = (char*)malloc(sizeof(char) * 10);
             sprintf(cid, "%d.%d", (int)process->pid, i);
             float child_id = atof(cid);
             
-            new_node->arr_time = process->arr_time;                     // Add the process to the cpu processes list(DELETE)
+            new_node->arr_time = process->arr_time;                     
             new_node->pid = child_id;
-            new_node->child_id = i;
             new_node->children_list_head = process->children_list_head;
-            new_node->parent = process;                                 //sprintf(result, "%lu", process->pid); // Maximum value of a child process id can be 1024
+            new_node->parent = process;
             new_node->exec_time = ceil((double)process->rem_exec_time / (double)num_cpus) + 1;
             new_node->parallelisability = process->parallelisability;
             new_node->rem_exec_time = ceil((double)process->rem_exec_time / (double)num_cpus) + 1;
@@ -256,7 +255,6 @@ void add_process_to_cpu(struct process* process, int num_cpus, struct cpu **cpu_
             
             new_node2->arr_time = process->arr_time;                     // Add the process to the cpu processes list(DELETE)
             new_node2->pid = child_id;
-            new_node2->child_id = i;
             new_node2->children_list_head = process->children_list_head;
             new_node2->parent = process;                                 //sprintf(result, "%lu", process->pid); // Maximum value of a child process id can be 1024
             new_node2->exec_time = ceil((double)process->rem_exec_time / (double)num_cpus) + 1;
@@ -289,7 +287,6 @@ void add_process_to_cpu(struct process* process, int num_cpus, struct cpu **cpu_
 
         new_node->arr_time = process->arr_time;                     // Add the process to the cpu processes list(DELETE)
         new_node->pid = process->pid;
-        new_node->child_id = process->child_id;
         new_node->exec_time = process->exec_time;
         new_node->parallelisability = process->parallelisability;
         new_node->rem_exec_time = process->rem_exec_time;
@@ -417,8 +414,7 @@ void insert_process_into_linked_list(struct process** head_ptr, char* process_da
 
    new_node->rem_exec_time = new_node->exec_time;
    new_node->cpu_ptr = NULL;                           
-   new_node->next = NULL;
-   new_node->child_id = -1;  // -1 indicates the process is not a child process/ subprocess 
+   new_node->next = NULL; 
    new_node->children_list_head = NULL;
    new_node->parent = NULL;
 
