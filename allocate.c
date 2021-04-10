@@ -173,7 +173,9 @@ int main(int argc, char* argv[]) {
             
             // Checks if the running process has finished executing
             if ((cpu_array[i].running_process_ptr != NULL) && (cpu_array[i].running_process_ptr->rem_exec_time == 0)){
-                // If a child process has finished, check if the other child processes have finished before decrementing proc_rem
+
+                
+
 
                 // Check if the running process that has finished is a Child process or not
                 if (cpu_array[i].running_process_ptr->parallelisability == 'p' && num_cpus > 1){
@@ -243,13 +245,23 @@ int main(int argc, char* argv[]) {
 
                 // This below code gets executed if the running process that has completed is NOT a child process
                 else {
-                    proc_rem--;
-                    processes_remaining--;
-                    printf("%lu,FINISHED,pid=%d,proc_remaining=%lu\n", current_time, (int)cpu_array[i].running_process_ptr->pid, proc_rem);
-                    // Setting the Completed Time for a process when it has completed in the Main Linked List
-                    get_ptr_to_process_equal_to_pid(head, cpu_array[i].running_process_ptr->pid)->completed_time = current_time;
-                    remove_process_from_cpu(&cpu_array[i].processes_head, cpu_array[i].running_process_ptr->pid); // Removes the process from the CPU's processes linked list
 
+                    //Check if there are other processes Finishing at the same time
+                    for (int j=0; j<num_cpus; j++){
+                        if ((cpu_array[j].running_process_ptr != NULL) && (cpu_array[j].running_process_ptr->rem_exec_time == 0)){
+                            proc_rem--;
+                            processes_remaining--;
+                            
+                        }
+                    }
+                    for (int j=0; j<num_cpus; j++){
+                        if ((cpu_array[j].running_process_ptr != NULL) && (cpu_array[j].running_process_ptr->rem_exec_time == 0)){
+                            printf("%lu,FINISHED,pid=%d,proc_remaining=%lu\n", current_time, (int)cpu_array[j].running_process_ptr->pid, proc_rem);
+                            // Setting the Completed Time for a process when it has completed in the Main Linked List
+                            get_ptr_to_process_equal_to_pid(head, cpu_array[j].running_process_ptr->pid)->completed_time = current_time;
+                            remove_process_from_cpu(&cpu_array[j].processes_head, cpu_array[j].running_process_ptr->pid); // Removes the process from the CPU's processes linked list
+                        }
+                    }
                     // CHECK AGAIN HERE TO SET THE PROCESS WITH THE SHORTEST EXECUTION TIME
                     //Traverse trough LL from head to find node with lowest rem_exec_time and set it to the run pointer
                     if (!processes_remaining){   /*If All process's rem_exec_time is equal to zero, i.e. if all processes are completed*/
@@ -260,19 +272,23 @@ int main(int argc, char* argv[]) {
                         // Check the current CPU for any other processes that can be run
                         // IF yes, then set it as the run pointer of the current cpu, and PRINT it out
                         // If no, then don't print out anything of the current CPU, and move to the next CPU
-                        set_cpu_running_process_ptr(&(cpu_array[i]));
-                        if( cpu_array[i].running_process_ptr != NULL){
-                            // If the process running is a Child process
-                            if (cpu_array[i].running_process_ptr->parallelisability == 'p' && num_cpus > 1){
-                                printf("%lu,RUNNING,pid=%.1f,remaining_time=%lu,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
+                        for (int j=0; j<num_cpus; j++){
+                            if ((cpu_array[j].running_process_ptr != NULL) && (cpu_array[j].running_process_ptr->rem_exec_time == 0)){
+                                set_cpu_running_process_ptr(&(cpu_array[j]));
+                                if( cpu_array[j].running_process_ptr != NULL){
+                                    // If the process running is a Child process
+                                    if (cpu_array[i].running_process_ptr->parallelisability == 'p' && num_cpus > 1){
+                                        printf("%lu,RUNNING,pid=%.1f,remaining_time=%lu,cpu=%d\n", current_time, cpu_array[j].running_process_ptr->pid, cpu_array[j].running_process_ptr->rem_exec_time, cpu_array[j].cpu_id);
+                                    }
+                                    else{
+                                        printf("%lu,RUNNING,pid=%d,remaining_time=%lu,cpu=%d\n", current_time, (int)cpu_array[j].running_process_ptr->pid, cpu_array[j].running_process_ptr->rem_exec_time, cpu_array[j].cpu_id);
+                                    }
+                                } 
+                                // else {
+                                //     break;
+                                // }
                             }
-                            else{
-                                printf("%lu,RUNNING,pid=%d,remaining_time=%lu,cpu=%d\n", current_time, (int)cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
-                            }
-                        } 
-                        // else {
-                        //     break;
-                        // }
+                        }
                     }
                 }
                 
