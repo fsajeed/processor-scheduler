@@ -83,7 +83,10 @@ int main(int argc, char* argv[]) {
         if (has_process_arrived_at_current_time(head, current_time)) {
             // Insert all the processes arriving at the same time to relevant CPUs
             if (has_same_arrival_times(head)){
-                // sort_remaining_execution_times(&head);
+                // print_pids_in_list(head);
+                sort_remaining_execution_times(head);
+                // printf("\nAfter Sorting\n");
+                // print_pids_in_list(head);
                 struct process* curr = head;
                 while (curr != NULL){
                     if (curr->arr_time == current_time){

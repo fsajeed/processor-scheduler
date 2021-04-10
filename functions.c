@@ -582,6 +582,14 @@ void printList(struct process* p)
     }
 }
 
+void print_pids_in_list(struct process* p)
+{
+    while (p != NULL) {
+        printf(" %d ", (int)p->pid);
+        p = p->next;
+    }
+}
+
 void print_CPU_process_list(struct process* processes_head)
 {
     struct process* p = processes_head;
@@ -601,73 +609,59 @@ void print_CPU_ids(struct cpu* cpu_array, int num_cpus)
 
 
 
-// /* function to swap data of two nodes a and b*/
-// void swap(struct process **a, struct process **b)
-// {
-//     struct process **temp = a;
-//     *a = *b;
-//     b = temp;
-// }
+/* function to swap data of two nodes a and b*/
+void swap(struct process *a, struct process *b)
+{
+    float temp1 = a->pid;
+    a->pid = b->pid;
+    b->pid = temp1;
 
-// /* Bubble sort the given linked list */
-// void sort_remaining_execution_times(struct process **head)
-// {
-//     int swapped;
-//     struct process *ptr1;
-//     struct process *lptr = NULL;
-  
-//     /* Checking for empty list */
-//     if (*head == NULL)
-//         return;
-  
-//     do
-//     {
-//         swapped = 0;
-//         ptr1 = *head;
-  
-//         while (ptr1->next != lptr)
-//         {
-//             if (ptr1->rem_exec_time > ptr1->next->rem_exec_time)
-//             { 
-//                 swap(ptr1, ptr1->next);
-//                 swapped = 1;
-//             }
-//             ptr1 = ptr1->next;
-//         }
-//         lptr = ptr1;
-//     }
-//     while (swapped);
-// }
+    unsigned long int temp2 = a->arr_time;
+    a->arr_time = b->arr_time;
+    b->arr_time = temp2;
 
-// /* Bubble sort the given linked list */
-// void sort_pids(struct process *head)
-// {
-//     int swapped;
-//     struct process *ptr1;
-//     struct process *lptr = NULL;
+    unsigned long int temp3 = a->exec_time;
+    a->exec_time = b->exec_time;
+    b->exec_time = temp3;
+
+    unsigned long int temp4 = a->rem_exec_time;
+    a->rem_exec_time = b->rem_exec_time;
+    b->rem_exec_time = temp4;
+
+    char temp5 = a->parallelisability;
+    a->parallelisability = b->parallelisability;
+    b->parallelisability = temp5;
+}
+
+/* Bubble sort the given linked list */
+void sort_remaining_execution_times(struct process *head)
+{
+    int swapped;
+    struct process *ptr1;
+    struct process *lptr = NULL;
   
-//     /* Checking for empty list */
-//     if (head == NULL)
-//         return;
+    /* Checking for empty list */
+    if (head == NULL)
+        return;
   
-//     do
-//     {
-//         swapped = 0;
-//         ptr1 = head;
+    do
+    {
+        swapped = 0;
+        ptr1 = head;
   
-//         while (ptr1->next != lptr)
-//         {
-//             if (ptr1->rem_exec_time > ptr1->next->rem_exec_time)
-//             { 
-//                 swap(ptr1, ptr1->next);
-//                 swapped = 1;
-//             }
-//             ptr1 = ptr1->next;
-//         }
-//         lptr = ptr1;
-//     }
-//     while (swapped);
-// }
+        while (ptr1->next != lptr)
+        {
+            if (ptr1->rem_exec_time > ptr1->next->rem_exec_time)
+            { 
+                swap(ptr1, ptr1->next);
+                swapped = 1;
+            }
+            ptr1 = ptr1->next;
+        }
+        lptr = ptr1;
+    }
+    while (swapped);
+}
   
 
 
