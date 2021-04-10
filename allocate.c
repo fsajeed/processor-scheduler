@@ -76,7 +76,6 @@ int main(int argc, char* argv[]) {
         // printf("%lu ", current_time);
         // print_CPU_process_list(cpu_array[1].processes_head);
         // printf("\nCurrent_time:%d , CPU-0-REM-TIME:%d , CPU-1-REM-TIME:%d\n", current_time, cpu_array[0].cpu_rem_exec_time, cpu_array[1].cpu_rem_exec_time );
-        // RUN A FOR LOOP HERE FOR MORE THAN 1 CPUS
 
 
         
@@ -140,10 +139,10 @@ int main(int argc, char* argv[]) {
 
         // DEBUG CODE
         // for (int i=0; i<num_cpus; i++){
-        //     printf("%lu ", current_time);
+        //     printf("\n%lu CPU%d: ", current_time, cpu_array[i].cpu_id);
         //     print_CPU_process_list(cpu_array[i].processes_head);
         //     if (cpu_array[i].running_process_ptr != NULL){
-        //     printf("RUNNING: %.1f\n", cpu_array[i].running_process_ptr->pid);
+        //     printf("\nRUNNING: %.1f\n", cpu_array[i].running_process_ptr->pid);
         //     }
         // }
 
@@ -191,9 +190,11 @@ int main(int argc, char* argv[]) {
                         // Setting the Completed Time for a process when it has completed in the Main Linked List
                         get_ptr_to_process_equal_to_pid(head, cpu_array[i].running_process_ptr->parent->pid)->completed_time = current_time;
 
-                        for (int k=0; k<num_cpus; k++){
-                            set_cpu_running_process_ptr(&(cpu_array[k]));
+                        //Setting new processes to run in each CPU
+                        for (int j=0; j<num_cpus; j++){
+                            set_cpu_running_process_ptr(&(cpu_array[j]));
                         }
+                        // break;
                         
                         for (int j=0; j<num_cpus; j++){
                             if( cpu_array[j].running_process_ptr != NULL){
@@ -259,7 +260,7 @@ int main(int argc, char* argv[]) {
                         if( cpu_array[i].running_process_ptr != NULL){
                             // If the process running is a Child process
                             if (cpu_array[i].running_process_ptr->parallelisability == 'p' && num_cpus > 1){
-                                printf("%lu,RUNNING,pid=%.1f,remaining_time=%lu,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->child_id, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
+                                printf("%lu,RUNNING,pid=%.1f,remaining_time=%lu,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
                             }
                             else{
                                 printf("%lu,RUNNING,pid=%d,remaining_time=%lu,cpu=%d\n", current_time, (int)cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);

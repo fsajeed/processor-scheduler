@@ -203,10 +203,8 @@ void add_process_to_cpu(struct process* process, int num_cpus, struct cpu **cpu_
     if (process->parallelisability == 'p' && num_cpus > 1) {
         // To extend the time on each CPU
         for (int i=0; i<num_cpus; i++){
-            (*cpu_array)[i].cpu_rem_exec_time += (process->rem_exec_time / num_cpus) + 1;
+            (*cpu_array)[i].cpu_rem_exec_time += ceil((double)process->rem_exec_time / (double)num_cpus) + 1;
         }
-        // Also set the parent process's new "remaining" execution time
-        // process->rem_exec_time = (process->rem_exec_time / num_cpus) + 1;
     }
     else {
         min_cpu_ptr->cpu_rem_exec_time += process->rem_exec_time; //Updating the allocated cpu's remaining execution time
@@ -232,9 +230,9 @@ void add_process_to_cpu(struct process* process, int num_cpus, struct cpu **cpu_
             new_node->child_id = i;
             new_node->children_list_head = process->children_list_head;
             new_node->parent = process;                                 //sprintf(result, "%lu", process->pid); // Maximum value of a child process id can be 1024
-            new_node->exec_time = (process->rem_exec_time / num_cpus) + 1;
+            new_node->exec_time = ceil((double)process->rem_exec_time / (double)num_cpus) + 1;
             new_node->parallelisability = process->parallelisability;
-            new_node->rem_exec_time = (process->rem_exec_time / num_cpus) + 1;
+            new_node->rem_exec_time = ceil((double)process->rem_exec_time / (double)num_cpus) + 1;
             new_node->completed_time = process->completed_time;
             new_node->cpu_ptr = process->cpu_ptr;
             new_node->next = NULL;
@@ -260,9 +258,9 @@ void add_process_to_cpu(struct process* process, int num_cpus, struct cpu **cpu_
             new_node2->child_id = i;
             new_node2->children_list_head = process->children_list_head;
             new_node2->parent = process;                                 //sprintf(result, "%lu", process->pid); // Maximum value of a child process id can be 1024
-            new_node2->exec_time = (process->rem_exec_time / num_cpus) + 1;
+            new_node2->exec_time = ceil((double)process->rem_exec_time / (double)num_cpus) + 1;
             new_node2->parallelisability = process->parallelisability;
-            new_node2->rem_exec_time = (process->rem_exec_time / num_cpus) + 1;
+            new_node2->rem_exec_time = ceil((double)process->rem_exec_time / (double)num_cpus) + 1;
             new_node2->completed_time = process->completed_time;
             new_node2->cpu_ptr = process->cpu_ptr;
             new_node2->next = NULL;
