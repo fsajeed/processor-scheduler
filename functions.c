@@ -594,7 +594,7 @@ void print_CPU_process_list(struct process* processes_head)
         printf(" %.1f ", p->pid);
         p = p->next;
     }
-    printf("\n");
+    // printf("\n");
 }
 
 
