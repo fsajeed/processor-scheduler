@@ -271,6 +271,7 @@ void add_process_to_cpu(struct Process* process, int num_cpus, struct Cpu **cpu_
             new_node->completed_time = process->completed_time;
             new_node->next = NULL;
             
+            free(cid);
 
             /* Adding to the CPU processes list */
             if ((*cpu_array)[i].processes_head == NULL){
@@ -525,6 +526,18 @@ double calculate_avg_time_overhead(struct Process* head, int process_count) {
     return avg;
 }
 
+void free_linked_list(struct Process* head)
+{
+   struct Process* temp;
+
+   while (head != NULL)
+    {
+       temp = head;
+       head = head->next;
+       free(temp);
+    }
+
+}
 /**********************************************************************************************************************************************************************************************/
 
 
