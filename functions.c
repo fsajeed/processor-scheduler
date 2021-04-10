@@ -1,72 +1,81 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 #include <stdbool.h>
+#include <limits.h>
 #include <math.h>
 
+
 struct Process {
-    unsigned long int arr_time;               // 'unsigned long int' data type used to cover the arrival time range of [0,2^32)
-    float pid;                    // 'unsigned long int' data type used to cover the process id range of [0,2^32)
-    struct Process* children_list_head;
-    struct Process* parent;
-    unsigned long int exec_time;              // 'unsigned long int' data type used to cover the execution time range of [1,2^32)
-    char parallelisability;    // need to conver to just character later
+    unsigned long int arr_time;                 // 'unsigned long int' data type used to cover the arrival time range of [0,2^32).
+    float pid;                                  // 'float' data type used to cover the process id range of [0,2^32) and also to use as process ids for child processes/subprocesses.
+    unsigned long int exec_time;                // 'unsigned long int' data type used to cover the execution time range of [1,2^32).
+    char parallelisability;
     unsigned long int rem_exec_time;
     unsigned long int completed_time;
-    struct Cpu *cpu_ptr;        // Should contain the reference/pointer to the CPU
-    struct Process *next;       // Pointer pointing to the next process stored in the Linked List
+    struct Process* children_list_head;         // Linked List containing all the subprocesses from the process.
+    struct Process* parent;                     // Used by child processes when they are initialised, this pointer variable holds reference to the parent process of a child process. Parent processes have this variable set to NULL.
+    struct Process *next;                  
 };
 
 struct Cpu {
     int cpu_id;
-    struct Process* processes_head;
-    unsigned long int cpu_rem_exec_time;
-    struct Process* running_process_ptr; // Pointer to the process that the CPU is currently running
+    struct Process* processes_head;             // Linked List containing the queue of processes to be run by the CPU.
+    unsigned long int cpu_rem_exec_time;        // Stores the remaining execution time of the CPU.
+    struct Process* running_process_ptr;        // Pointer to the process that the CPU is currently running.
 };
 
-// The struct used for constructing the Linked List in the CPU struct
-// struct Process_address_container {
-//     struct Process* process_ptr;
-//     struct Process_address_container* next;
-// };
 
-int calculate_turnaround_time(struct Process* head, int process_count){
-    double total = 0;
-    double turnaround_time;
-    struct Process* temp = head;
-    while(temp != NULL){
-        total += ((temp->completed_time) - (temp->arr_time));
-        temp = temp->next;
-    }
-    turnaround_time = ceil(total/process_count);
-    return (int)turnaround_time;
+void insert_process_into_linked_list(struct Process** head_ptr, char* process_data) {
+
+   struct Process* new_node = (struct Process*)malloc(sizeof(struct Process));
+   struct Process* temp;
+   
+   // Extract the first token
+   char * token = strtok(process_data, " ");
+   int count = 0;
+   // loop through the string to extract all other tokens
+   while( token != NULL ) {
+    //   printf("%s\n", token); //printing each token
+
+    /* Inserting data from each line of file into Linked List nodes */
+      if (count == 0) {
+          new_node->arr_time = atoi(token);
+      }
+      else if (count == 1){
+          new_node->pid = atoi(token);
+      }
+      else if (count == 2){
+          new_node->exec_time = atoi(token);
+      }
+      else if (count == 3){
+          new_node->parallelisability = *token;
+      }  
+      
+    /****************************/
+      token = strtok(NULL, " ");
+      count++;
+   }
+
+   new_node->rem_exec_time = new_node->exec_time;                          
+   new_node->next = NULL; 
+   new_node->children_list_head = NULL;
+   new_node->parent = NULL;
+
+
+   if (*head_ptr == NULL){
+       *head_ptr = new_node;
+       return; 
+   }
+
+   temp = *head_ptr;
+   while (temp->next != NULL) {
+       temp = temp->next;
+   }
+   temp->next = new_node;
+   return;
 }
 
-double calculate_max_time_overhead(struct Process* head, int process_count){
-    double max = INT_MIN;
-    double overhead;
-    struct Process* temp = head;
-    while(temp != NULL){
-        overhead = (double)((temp->completed_time) - (temp->arr_time)) / temp->exec_time;
-        if (overhead > max){
-            max = overhead;
-        }
-        temp = temp->next;
-    }
-    return max;
-}
 
-double calculate_avg_time_overhead(struct Process* head, int process_count){
-    double total_overhead = 0;
-    double avg;
-    struct Process* temp = head;
-    while(temp != NULL){
-        total_overhead += (double)((temp->completed_time) - (temp->arr_time)) / temp->exec_time;
-        temp = temp->next;
-    }
-    avg = total_overhead/process_count;
-    return avg;
-}
 
 struct Process* set_cpu_running_process_ptr(struct Cpu* cpu_ptr)
 {
@@ -91,7 +100,7 @@ struct Process* set_cpu_running_process_ptr(struct Cpu* cpu_ptr)
         }
     temp = temp->next;
     }
-    // return min_ptr;
+
     cpu_ptr->running_process_ptr = min_ptr;
 
     return min_ptr;
@@ -234,7 +243,6 @@ void add_process_to_cpu(struct Process* process, int num_cpus, struct Cpu **cpu_
             new_node->parallelisability = process->parallelisability;
             new_node->rem_exec_time = ceil((double)process->rem_exec_time / (double)num_cpus) + 1;
             new_node->completed_time = process->completed_time;
-            new_node->cpu_ptr = process->cpu_ptr;
             new_node->next = NULL;
             
 
@@ -261,7 +269,6 @@ void add_process_to_cpu(struct Process* process, int num_cpus, struct Cpu **cpu_
             new_node2->parallelisability = process->parallelisability;
             new_node2->rem_exec_time = ceil((double)process->rem_exec_time / (double)num_cpus) + 1;
             new_node2->completed_time = process->completed_time;
-            new_node2->cpu_ptr = process->cpu_ptr;
             new_node2->next = NULL;
 
             /* Adding to the Parent process's children processes list */
@@ -291,7 +298,6 @@ void add_process_to_cpu(struct Process* process, int num_cpus, struct Cpu **cpu_
         new_node->parallelisability = process->parallelisability;
         new_node->rem_exec_time = process->rem_exec_time;
         new_node->completed_time = process->completed_time;
-        new_node->cpu_ptr = process->cpu_ptr;
         new_node->next = NULL;
 
         
@@ -347,92 +353,9 @@ struct Process* get_process_with_smallest_rem_time_accounting_for_duplicates(str
 }
 
 
-// Returns pointer to process with the smallest remaining execution time, after breaking ties with pid
-struct Process* get_process_with_smallest_rem_time_breaking_ties(struct Process* head)   
-{
-    struct Process* temp = head;
-    struct Process* min_ptr = NULL;
-    // Declare a min variable and initialize
-    // it with UINT_MAX value.
-    // UINT_MAX is integer type and its value
-    // is 32767 or greater.
-    unsigned long int min = ULONG_MAX;
-  
-    // Check loop while head not equal to NULL
-    while (temp != NULL) {
-        // SKIP THE PROCESS THAT HAS FINISHED
-        if (temp->rem_exec_time != 0) { 
-            if (min > (temp->rem_exec_time)){
-                min = temp->rem_exec_time;
-                min_ptr = temp;
-            }
-            //BREAK TIE USING PID WHEN min value is same as the current process's rem_exec_time
-            else if (min == temp->rem_exec_time){
-                if(min_ptr->pid > temp->pid) {
-                    min_ptr = temp;
-                }
-                else {
-                    // DO NOTHING - min_ptr will not be changed as it already has the lowest pid among the two
-                }
-            }
-        }
-        temp = temp->next;
-    }
-    return min_ptr;
-}
-
-void insert_process_into_linked_list(struct Process** head_ptr, char* process_data) {
-
-   struct Process* new_node = (struct Process*)malloc(sizeof(struct Process));
-   struct Process* temp;
-   
-   // Extract the first token
-   char * token = strtok(process_data, " ");
-   int count = 0;
-   // loop through the string to extract all other tokens
-   while( token != NULL ) {
-    //   printf("%s\n", token); //printing each token
-
-    /* Inserting data from each line of file into Linked List nodes */
-      if (count == 0) {
-          new_node->arr_time = atoi(token);
-      }
-      else if (count == 1){
-          new_node->pid = atoi(token);
-      }
-      else if (count == 2){
-          new_node->exec_time = atoi(token);
-      }
-      else if (count == 3){
-          new_node->parallelisability = *token;
-      }  
-      
-    /****************************/
-      token = strtok(NULL, " ");
-      count++;
-   }
-
-   new_node->rem_exec_time = new_node->exec_time;
-   new_node->cpu_ptr = NULL;                           
-   new_node->next = NULL; 
-   new_node->children_list_head = NULL;
-   new_node->parent = NULL;
 
 
-   if (*head_ptr == NULL){
-       *head_ptr = new_node;
-       return; 
-   }
 
-   temp = *head_ptr;
-   while (temp->next != NULL) {
-       temp = temp->next;
-   }
-   temp->next = new_node;
-   return;
-}
-
-// bool is_all
 
 // Function to check if there are processes with same arrival times in the Linked List
 bool has_same_arrival_times(struct Process* head)
@@ -498,89 +421,6 @@ struct Process* get_ptr_to_process_equal_to_pid(struct Process* head, float proc
     return current;
 }
 
-bool is_all_process_completed(struct Process* head){
-
-    struct Process* curr = head;
-
-    while (curr->rem_exec_time == 0){  // While loop checking if all rem_exec_time values are 0
-        curr = curr->next;
-
-        if (curr == NULL){
-        return true;
-        }
-    }
-    return false;
-
-}
-
-// Function to print the second
-// smallest element
-struct Process* get_shortest_rem_exec_time_process(struct Process* head)
-{
-    unsigned long int first = 0, second = ULONG_MAX; // Here first is equal to 0 is because, we know the first lowest rem_exec_time is 0 as one process already finished
-  
-    struct Process* temp = head;
-    struct Process* ptr;
-    while (temp != NULL) {
-  
-        if (temp->rem_exec_time < first) {
-            second = first;
-            first = temp->rem_exec_time;
-        }
-  
-        // If current node's data is in between
-        // first and second then update second
-        else if (temp->rem_exec_time < second && temp->rem_exec_time != first){
-            second = temp->rem_exec_time;
-            ptr = temp;
-
-        }
-  
-        temp = temp->next;
-    }
-  
-    if (second == ULONG_MAX){
-        // cout << "There is no second smallest element\n";
-        return NULL;
-    }
-    else {
-        return ptr;
-    }
-}
-
-// Function that returns smallest element
-// from the linked list.
-struct Process* smallestArrivalTime(struct Process* head)       // NEED TO SORT OUT TIES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-{
-    struct Process* temp = head;
-    struct Process* min_ptr;
-    // Declare a min variable and initialize
-    // it with UINT_MAX value.
-    // UINT_MAX is integer type and its value
-    // is 32767 or greater.
-    unsigned long int min = ULONG_MAX;
-  
-    // Check loop while head not equal to NULL
-    while (temp != NULL) {
-        // If min is greater than temp->arr_time then
-        // assign value of temp->arr_time to min
-        // otherwise node point to next node.
-        if (min > (temp->arr_time)) {
-            min = temp->arr_time;
-            min_ptr = temp;
-        }
-        temp = temp->next;
-    }
-    return min_ptr;
-}
-
-void printList(struct Process* p)
-{
-    while (p != NULL) {
-        printf("\n%lu\n", p->arr_time);
-        p = p->next;
-    }
-}
 
 void print_pids_in_list(struct Process* p)
 {
@@ -633,6 +473,7 @@ void swap(struct Process *a, struct Process *b)
     b->parallelisability = temp5;
 }
 
+
 /* Bubble sort the given linked list */
 void sort_remaining_execution_times(struct Process *head)
 {
@@ -662,94 +503,41 @@ void sort_remaining_execution_times(struct Process *head)
     }
     while (swapped);
 }
-  
 
+int calculate_turnaround_time(struct Process* head, int process_count) {
+    double total = 0;
+    double turnaround_time;
+    struct Process* temp = head;
+    while(temp != NULL){
+        total += ((temp->completed_time) - (temp->arr_time));
+        temp = temp->next;
+    }
+    turnaround_time = ceil(total/process_count);
+    return (int)turnaround_time;
+}
 
+double calculate_max_time_overhead(struct Process* head, int process_count) {
+    double max = INT_MIN;
+    double overhead;
+    struct Process* temp = head;
+    while(temp != NULL){
+        overhead = (double)((temp->completed_time) - (temp->arr_time)) / temp->exec_time;
+        if (overhead > max){
+            max = overhead;
+        }
+        temp = temp->next;
+    }
+    return max;
+}
 
-
-// void add_all_processes_arriving_at_same_time(struct Process* head, int num_cpus, struct Cpu **cpu_array, int current_time){
-
-//     struct Process* curr = head;
-//     while (curr != NULL){
-//         if (curr->arr_time == current_time){
-//             add_process_to_cpu(curr, num_cpus, cpu_array);
-//             curr = curr->next;
-//         }
-//         else{
-//             curr = curr->next;
-//         }
-//     }
-// }
-
-
-// // Function that returns a linked list of processes with same arrival times
-// void get_arrival_times_list(struct Process* head, int time, struct Process** list_head)
-// {
-//     // int count = 0;
-//     (*list_head) = NULL;
-//     struct Process* temp;
-  
-//     while (head->next != NULL) {
-  
-//         // Starting from the next node
-//         struct Process* ptr = head->next;
-//         while (ptr != NULL) {
-  
-//             // If some duplicate arrival times are found
-//             if (head->arr_time == ptr->arr_time) {
-
-//                 if ((*list_head) == NULL){
-//                     (*list_head) = head; 
-//                     (*list_head)->next = NULL;
-//                 }
-
-//                 else if ((*list_head) != NULL){
-//                     temp = (*list_head);
-//                     while (temp->next != NULL) {
-//                         temp = temp->next;
-//                     }
-//                     temp->next = head;
-//                 }
-
-//                 break;
-//             }
-
-//             ptr = ptr->next;
-//         }
-
-//         head = head->next;
-//     }
-
-//     // return count;
-// }
-
-
-// // Function that returns a linked list of processes with same arrival times
-// struct Process* get_arrival_times_list(struct Process* head, int time)
-// {
-//     struct Process* list_head = NULL;
-//     struct Process* temp;
-  
-//     while (head != NULL) {
-    
-//         // If some duplicate arrival times are found
-//         if (head->arr_time == time) {
-
-//             if (list_head == NULL){
-//                 list_head = head; 
-//                 list_head->next = NULL;
-//             }
-
-//             else if (list_head != NULL){
-//                 temp = list_head;
-//                 while (temp->next != NULL) {
-//                     temp = temp->next;
-//                 }
-//                 temp->next = head;
-//                 temp->next->next = NULL; // Making sure the last node do not point to anything
-//             }
-//         }
-//         head = head->next;
-//     }
-//     return list_head;
-// }
+double calculate_avg_time_overhead(struct Process* head, int process_count) {
+    double total_overhead = 0;
+    double avg;
+    struct Process* temp = head;
+    while(temp != NULL){
+        total_overhead += (double)((temp->completed_time) - (temp->arr_time)) / temp->exec_time;
+        temp = temp->next;
+    }
+    avg = total_overhead/process_count;
+    return avg;
+}
