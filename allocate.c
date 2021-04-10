@@ -286,7 +286,6 @@ int main(int argc, char* argv[]) {
     printf("Turnaround time %d\n", calculate_turnaround_time(head, process_count));
     printf("Time overhead %.2f %.2f\n", calculate_max_time_overhead(head, process_count), calculate_avg_time_overhead(head, process_count));
     printf("Makespan %lu\n", current_time);
-    print_CPU_ids(cpu_array, num_cpus);
 
 /******************************************************************************************************************************/
     
