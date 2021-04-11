@@ -1,5 +1,5 @@
-*.exe
 *.o
+*.exe
 README
 testcases/
 
