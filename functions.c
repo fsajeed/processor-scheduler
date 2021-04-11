@@ -391,11 +391,10 @@ time value, returns NULL if no match is found.
 */
 struct Process* get_ptr_to_process_equal_to_curr_time(struct Process* head, unsigned long int time)
 {
-    struct Process* current = head;  // Initialize current
+    struct Process* current = head;
     while (current != NULL)
     {
         if (current->arr_time == time){
-            // return current;
             break;
         }
         current = current->next;
@@ -410,19 +409,16 @@ otherwise returns NULL.
 */
 struct Process* get_ptr_to_process_equal_to_pid(struct Process* head, float process_id)
 {
-    struct Process* current = head;  // Initialize current
+    struct Process* current = head;
     while (current != NULL)
     {
         if (current->pid == process_id){
-            // return current;
             break;
         }
         current = current->next;
     }
     return current;
 }
-
-
 
 
 /* 
@@ -488,6 +484,10 @@ void sort_remaining_execution_times(struct Process *head)
     while (swapped);
 }
 
+/*
+Function takes the head pointer of the main linked list and number of processes as parameters.
+Computes and returns the Turnaround Time of the processes.
+*/
 int calculate_turnaround_time(struct Process* head, int process_count) {
     double total = 0;
     double turnaround_time;
@@ -500,6 +500,10 @@ int calculate_turnaround_time(struct Process* head, int process_count) {
     return (int)turnaround_time;
 }
 
+/*
+Function takes the head pointer of the main linked list and number of processes as parameters.
+Computes and returns the Maximum Time Overhead of the processes.
+*/
 double calculate_max_time_overhead(struct Process* head, int process_count) {
     double max = INT_MIN;
     double overhead;
@@ -514,6 +518,10 @@ double calculate_max_time_overhead(struct Process* head, int process_count) {
     return max;
 }
 
+/*
+Function takes the head pointer of the main linked list and number of processes as parameters.
+Computes and returns the Average Time Overhead of the processes.
+*/
 double calculate_avg_time_overhead(struct Process* head, int process_count) {
     double total_overhead = 0;
     double avg;
@@ -526,10 +534,13 @@ double calculate_avg_time_overhead(struct Process* head, int process_count) {
     return avg;
 }
 
+/*
+Function takes a linked list head pointer as parameter
+and frees the memory of all the nodes within the list.
+*/
 void free_linked_list(struct Process* head)
 {
    struct Process* temp;
-
    while (head != NULL)
     {
        temp = head;
@@ -539,33 +550,3 @@ void free_linked_list(struct Process* head)
 
 }
 /**********************************************************************************************************************************************************************************************/
-
-
-
-/*************************   DEBUG FUNCTIONS   *****************************/
-void print_pids_in_list(struct Process* p)
-{
-    while (p != NULL) {
-        printf(" %d ", (int)p->pid);
-        p = p->next;
-    }
-}
-
-void print_CPU_process_list(struct Process* processes_head)
-{
-    struct Process* p = processes_head;
-    while (p != NULL) {
-        printf(" %.1f ", p->pid);
-        p = p->next;
-    }
-    // printf("\n");
-}
-
-void print_CPU_ids(struct Cpu* cpu_array, int num_cpus)
-{
-    for (int i=0; i<num_cpus; i++) {
-        printf(" %d ", cpu_array[i].cpu_id);
-    }
-}
-
-/*********************************************************************************/

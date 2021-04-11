@@ -104,12 +104,9 @@ int main(int argc, char* argv[]) {
             for (int i=0; i<num_cpus; i++){ 
 
                 // If a process is already running in that CPU
-                if (cpu_array[i].running_process_ptr != NULL) {  
-                    // Check if the currently running process in the CPU is the same as the newly assigned running process in the CPU. 
-                    if (cpu_array[i].running_process_ptr == set_cpu_running_process_ptr(&(cpu_array[i]))){
-                        //If it is the same process being run, then no need to print it out
-                    }
-                    else {
+                if (cpu_array[i].running_process_ptr != NULL) {
+                    // If the running process in the CPU is NOT equal to the newly assigned running process
+                    if (cpu_array[i].running_process_ptr != set_cpu_running_process_ptr(&(cpu_array[i]))) {
                         // If the process running is a Child process (Parallelisability of a child process is 'p' because the parent process does not get added, rather copies of the parent gets added to the CPU as child processes except with different process ids).
                         if (cpu_array[i].running_process_ptr->parallelisability == 'p' && num_cpus > 1){
                             printf("%lu,RUNNING,pid=%.1f,remaining_time=%lu,cpu=%d\n", current_time, cpu_array[i].running_process_ptr->pid, cpu_array[i].running_process_ptr->rem_exec_time, cpu_array[i].cpu_id);
@@ -136,22 +133,10 @@ int main(int argc, char* argv[]) {
             }      
         }
 
-
-        // DEBUG CODE
-        // for (int i=0; i<num_cpus; i++){
-        //     printf("\n%lu CPU%d: ", current_time, cpu_array[i].cpu_id);
-        //     print_CPU_process_list(cpu_array[i].processes_head);
-        //     if (cpu_array[i].running_process_ptr != NULL){
-        //     printf("\nRUNNING: %.1f\n", cpu_array[i].running_process_ptr->pid);
-        //     }
-        // }
-
-         
-
 /***************************************************************** DECREMENT SECTION ********************************************************************/
 
         // Loop to check for multiple CPUs
-        for (int i=0; i<num_cpus; i++){
+        for (int i=0; i<num_cpus; i++) {
             // Check if there is any process running on the CPU 
             if (cpu_array[i].running_process_ptr != NULL) { 
                 // Decrement the running process's execution time
@@ -222,7 +207,6 @@ int main(int argc, char* argv[]) {
 
                 // This below code gets executed if the running process that has completed is NOT a child process.
                 else {
-
                     //Check if there are other processes Finishing at the same time.
                     for (int j=0; j<num_cpus; j++){
                         if ((cpu_array[j].running_process_ptr != NULL) && (cpu_array[j].running_process_ptr->rem_exec_time == 0)){
@@ -270,6 +254,7 @@ int main(int argc, char* argv[]) {
     }  // Main execution loop ends
 
     free(cpu_array);
+
 /******************************************************************************************************************************/
 
     // Statistics Computation
@@ -282,5 +267,6 @@ int main(int argc, char* argv[]) {
     free_linked_list(head);
 
     fclose(fptr);
+
     return 0;
 }
