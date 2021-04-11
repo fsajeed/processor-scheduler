@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <math.h>
-#include "functions.c"
+#include "functions.h"
 
 #define MAX_FILE_LINE_LENGTH 50            // Approximation for maximum length of a line consisting of 2 unsigned long int data types (arrival time and remaining execution time), 1 float data type (process id) and one 1 character data type (parallelisability) along with some whitespaces.
 

@@ -1,35 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 #include <limits.h>
 #include <math.h>
-
-/*****************************************************************        Structs         **************************************************************************************/
-
-struct Process {
-    unsigned long int arr_time;                 // 'unsigned long int' data type used to cover the arrival time range of [0,2^32).
-    float pid;                                  // 'float' data type used to cover the process id range of [0,2^32) and also to use as process ids for child processes/subprocesses.
-    unsigned long int exec_time;                // 'unsigned long int' data type used to cover the execution time range of [1,2^32).
-    char parallelisability;
-    unsigned long int rem_exec_time;
-    unsigned long int completed_time;
-    struct Process* children_list_head;         // Linked List containing all the subprocesses from the process.
-    struct Process* parent;                     // Used by child processes when they are initialised, this pointer variable holds reference to the parent process of a child process. Parent processes have this variable set to NULL.
-    struct Process *next;                  
-};
-
-struct Cpu {
-    int cpu_id;
-    struct Process* processes_head;             // Linked List containing the queue of processes to be run by the CPU.
-    unsigned long int cpu_rem_exec_time;        // Stores the remaining execution time of the CPU.
-    struct Process* running_process_ptr;        // Pointer to the process that the CPU is currently running.
-};
-
-/*********************************************************************************************************************************************************************************/
-
+#include "functions.h"
 
 
 /*****************************************************************        Functions         **************************************************************************************/
+
 
 /*
 Function takes a reference (pointer to pointer) to the head of the
@@ -549,4 +528,3 @@ void free_linked_list(struct Process* head)
     }
 
 }
-/**********************************************************************************************************************************************************************************************/
