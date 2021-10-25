@@ -1,0 +1,28 @@
+0,RUNNING,pid=3,remaining_time=20,cpu=0
+0,RUNNING,pid=4,remaining_time=20,cpu=1
+0,RUNNING,pid=2,remaining_time=90,cpu=2
+0,RUNNING,pid=1,remaining_time=100,cpu=3
+20,FINISHED,pid=3,proc_remaining=6
+20,FINISHED,pid=4,proc_remaining=6
+20,RUNNING,pid=241,remaining_time=50,cpu=0
+20,RUNNING,pid=4222,remaining_time=90,cpu=1
+20,RUNNING,pid=2541,remaining_time=50,cpu=3
+70,FINISHED,pid=241,proc_remaining=8
+70,FINISHED,pid=2541,proc_remaining=8
+70,RUNNING,pid=413,remaining_time=100,cpu=0
+70,RUNNING,pid=1,remaining_time=80,cpu=3
+90,FINISHED,pid=2,proc_remaining=7
+90,RUNNING,pid=414,remaining_time=100,cpu=2
+110,FINISHED,pid=4222,proc_remaining=6
+110,RUNNING,pid=42522,remaining_time=90,cpu=1
+150,FINISHED,pid=1,proc_remaining=5
+150,RUNNING,pid=4163,remaining_time=100,cpu=3
+170,FINISHED,pid=413,proc_remaining=4
+170,RUNNING,pid=4142,remaining_time=100,cpu=0
+190,FINISHED,pid=414,proc_remaining=3
+200,FINISHED,pid=42522,proc_remaining=2
+250,FINISHED,pid=4163,proc_remaining=1
+270,FINISHED,pid=4142,proc_remaining=0
+Turnaround time 120
+Time overhead 2.21 1.45
+Makespan 270

@@ -1,0 +1,36 @@
+0,RUNNING,pid=1.0,remaining_time=5,cpu=0
+0,RUNNING,pid=1.1,remaining_time=5,cpu=1
+0,RUNNING,pid=1.2,remaining_time=5,cpu=2
+5,FINISHED,pid=1,proc_remaining=5
+5,RUNNING,pid=16.1,remaining_time=2,cpu=0
+5,RUNNING,pid=31.1,remaining_time=2,cpu=1
+5,RUNNING,pid=16.0,remaining_time=2,cpu=2
+7,FINISHED,pid=16,proc_remaining=7
+7,RUNNING,pid=31.0,remaining_time=2,cpu=0
+7,RUNNING,pid=93.0,remaining_time=2,cpu=1
+7,RUNNING,pid=93.1,remaining_time=2,cpu=2
+9,FINISHED,pid=31,proc_remaining=5
+9,FINISHED,pid=93,proc_remaining=5
+9,RUNNING,pid=11.1,remaining_time=4,cpu=0
+9,RUNNING,pid=11.2,remaining_time=4,cpu=1
+9,RUNNING,pid=11.0,remaining_time=4,cpu=2
+13,FINISHED,pid=11,proc_remaining=4
+13,RUNNING,pid=12.1,remaining_time=4,cpu=0
+13,RUNNING,pid=12.2,remaining_time=4,cpu=1
+13,RUNNING,pid=12.0,remaining_time=4,cpu=2
+17,FINISHED,pid=12,proc_remaining=3
+17,RUNNING,pid=23.0,remaining_time=4,cpu=0
+17,RUNNING,pid=23.1,remaining_time=4,cpu=1
+17,RUNNING,pid=23.2,remaining_time=4,cpu=2
+21,FINISHED,pid=23,proc_remaining=2
+21,RUNNING,pid=21.0,remaining_time=5,cpu=0
+21,RUNNING,pid=21.1,remaining_time=5,cpu=1
+21,RUNNING,pid=21.2,remaining_time=5,cpu=2
+26,FINISHED,pid=21,proc_remaining=1
+26,RUNNING,pid=3.0,remaining_time=8,cpu=0
+26,RUNNING,pid=3.1,remaining_time=8,cpu=1
+26,RUNNING,pid=3.2,remaining_time=8,cpu=2
+34,FINISHED,pid=3,proc_remaining=0
+Turnaround time 13
+Time overhead 3.00 1.78
+Makespan 34
