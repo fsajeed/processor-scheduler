@@ -40,7 +40,7 @@ Simulates scheduling with two processors using the default algorithm.
 
 ## Input Format
 The process file should contain one process per line, formatted as:
-<arrival_time> <process_id> <execution_time> <parallelizable>
+> <arrival_time> <process_id> <execution_time> <parallelizable>
 
 Example (processes.txt):
 ----------
