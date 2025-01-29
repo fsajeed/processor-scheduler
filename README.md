@@ -73,10 +73,10 @@ Sample Output
   * functions.c       – Scheduling logic
   * functions.h       – Function prototypes
 
-  📂 testcases/          – Sample input files
+  * 📂 testcases/          – Sample input files
 
-  📄 scheduler_testing_commands.txt – Testing file
+  * 📄 scheduler_testing_commands.txt – Testing file
 
-  📄 Makefile            – Compilation instructions
+  * 📄 Makefile            – Compilation instructions
 
-  📄 README.md           – Documentation
+  * 📄 README.md           – Documentation
