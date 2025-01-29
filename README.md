@@ -3,10 +3,10 @@ A CPU scheduling simulator for single, dual, and multi-processor environments.
 
 ## Overview
 This project simulates process scheduling in a multi-processor system. It assigns incoming processes to available processors using a shortest-time-remaining (STR) scheduling algorithm. The scheduler supports:
-✅ Single processor scheduling (Preemptive STR)
-✅ Dual processor scheduling (Handles parallelizable processes)
-✅ Multi-processor scheduling (N ≥ 3)
-✅ Performance optimization (Custom scheduling strategy)
+- ✅ Single processor scheduling (Preemptive STR)
+- ✅ Dual processor scheduling (Handles parallelizable processes)
+- ✅ Multi-processor scheduling (N ≥ 3)
+- ✅ Performance optimization (Custom scheduling strategy)
 
 ## Features
 - **Preemptive Scheduling:** Assigns CPU time to processes dynamically.
@@ -28,9 +28,9 @@ Run the scheduler with the following command:
 ./allocate -f <process_file> -p <processors> [-c]
 ```
 Note:
--f <process_file>: Specifies the input file containing process data.
--p <processors>: Number of processors (1, 2, or N).
--c (optional): Enables custom scheduling optimization.
+* -f <process_file>: Specifies the input file containing process data.
+* -p <processors>: Number of processors (1, 2, or N).
+* -c (optional): Enables custom scheduling optimization.
 
 ## Example
 ```
@@ -49,10 +49,10 @@ Example (processes.txt):
 > 5 1 20 p  
 > 20 3 30 n
 ----------
-** arrival_time: When the process enters the queue.
-** process_id: Unique identifier.
-** execution_time: Time required to complete.
-** parallelizable: p (parallelizable) or n (non-parallelizable).
+* arrival_time: When the process enters the queue.
+* process_id: Unique identifier.
+* execution_time: Time required to complete.
+* parallelizable: p (parallelizable) or n (non-parallelizable).
 
 ## Output Format
 The scheduler prints execution events and performance metrics.
