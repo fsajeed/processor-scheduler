@@ -1,40 +1,46 @@
-PROCESS SCHEDULER
+# Process Scheduler
 A CPU scheduling simulator for single, dual, and multi-processor environments.
 
-OVERVIEW
+## Overview
 This project simulates process scheduling in a multi-processor system. It assigns incoming processes to available processors using a shortest-time-remaining (STR) scheduling algorithm. The scheduler supports:
-✅ Single processor scheduling (Preemptive STR)
-✅ Dual processor scheduling (Handles parallelizable processes)
-✅ Multi-processor scheduling (N ≥ 3)
-✅ Performance optimization (Custom scheduling strategy)
+- ✅ **Single processor scheduling** (Preemptive STR)
+- ✅ **Dual processor scheduling** (Handles parallelizable processes)
+- ✅ **Multi-processor scheduling** (N ≥ 3)
+- ✅ **Performance optimization** (Custom scheduling strategy)
 
-FEATURES
-* Preemptive Scheduling: Assigns CPU time to processes dynamically.
-* Parallelizable Process Handling: Splits tasks across multiple CPUs.
-* Efficient Makespan Calculation: Tracks overall execution time.
-* Performance Metrics: Reports turnaround time, time overhead, and total execution time.
+## Features
+- **Preemptive Scheduling:** Assigns CPU time to processes dynamically.
+- **Parallelizable Process Handling:** Splits tasks across multiple CPUs.
+- **Efficient Makespan Calculation:** Tracks overall execution time.
+- **Performance Metrics:** Reports turnaround time, time overhead, and total execution time.
 
-INSTALLATION & COMPILATION
+## Installation and Compilation
 Ensure you have a C compiler (e.g., GCC) installed. Then, clone the repository and compile the program:
-  git clone https://github.com/fsajeed/processor-scheduler.git  
-  cd processor-scheduler  
-  make
+```
+git clone https://github.com/fsajeed/processor-scheduler.git  
+cd processor-scheduler  
+make
+```
 
-USAGE
+## Usage
 Run the scheduler with the following command:
-  ./allocate -f <process_file> -p <processors> [-c]
+```
+./allocate -f <process_file> -p <processors> [-c]
+```
 Notes:
-    -f <process_file>: Specifies the input file containing process data.
-    -p <processors>: Number of processors (1, 2, or N).
-    -c (optional): Enables custom scheduling optimization.
+-f <process_file>: Specifies the input file containing process data.
+-p <processors>: Number of processors (1, 2, or N).
+-c (optional): Enables custom scheduling optimization.
 
-EXAMPLE
+## Example
+```
 ./allocate -f processes.txt -p 2
+```
 Simulates scheduling with two processors using the default algorithm.
 
-INPUT FORMAT
+## Input Format
 The process file should contain one process per line, formatted as:
-  <arrival_time> <process_id> <execution_time> <parallelizable>
+<arrival_time> <process_id> <execution_time> <parallelizable>
 
 Example (processes.txt):
 ----------
@@ -48,20 +54,20 @@ process_id: Unique identifier.
 execution_time: Time required to complete.
 parallelizable: p (parallelizable) or n (non-parallelizable).
 
-OUTPUT FORMAT
+## Output Format
 The scheduler prints execution events and performance metrics.
 
 Sample Output
 -----------------------------------------
-20,RUNNING,pid=15,remaining_time=10,cpu=0  
-30,FINISHED,pid=15,proc_remaining=0  
+> 20,RUNNING,pid=15,remaining_time=10,cpu=0  
+> 30,FINISHED,pid=15,proc_remaining=0
 
-Turnaround time 62  
-Time overhead 2.93 1.90  
-Makespan 120
+> Turnaround time 62  
+> Time overhead 2.93 1.90  
+> Makespan 120
 -----------------------------------------
 
-PROJECT STRUCTURE
+## Project Structure
 📂 src/ – Source code
   * allocate.c – Main program
   * functions.c – Scheduling logic
