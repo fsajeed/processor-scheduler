@@ -56,6 +56,7 @@ Example (processes.txt):
 
 ## Output Format
 The scheduler prints execution events and performance metrics.
+
 Sample Output
 -----------------------------------------
 > 20,RUNNING,pid=15,remaining_time=10,cpu=0  
